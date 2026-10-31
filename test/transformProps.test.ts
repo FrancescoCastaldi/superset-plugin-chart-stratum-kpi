@@ -10,7 +10,8 @@ const run = (
   transformProps({
     width: 320,
     height: 160,
-    formData,
+    // The generated texts are Italian in these tests; the English ones are covered in 'locale' below
+    formData: { locale: 'it', ...formData },
     rawFormData,
     queriesData: [{ data }],
   } as any);
@@ -745,6 +746,84 @@ describe('KPI Comparison transformProps', () => {
 
       const propsNoWrap = run({ ...dualMetric, wrap_bottom_content: false }, [{ sum_richieste: 100, sum_richieste_conf: 90 }]);
       expect(propsNoWrap.wrapBottomContent).toBe(false);
+    });
+  });
+
+  describe('locale of generated texts', () => {
+    // No locale in the form data: the English default applies
+    const english = (formData: Record<string, any>, data: Row[] = [], rawFormData: Record<string, any> = {}) =>
+      transformProps({
+        width: 320,
+        height: 160,
+        formData,
+        rawFormData,
+        queriesData: [{ data }],
+      } as any);
+
+    it('writes the month names in English by default', () => {
+      const props = english(
+        { ...dualMetric, kpi_subtitle: '{month}', comparison_label: 'vs previous period' },
+        monthlyRows,
+      );
+      expect(props.kpiSubtitle).toBe('March 2026');
+      expect(props.comparisonLabel).toBe('vs February 2026');
+    });
+
+    it.each([
+      ['1 year ago', 'vs Same period last year'],
+      ['1 month ago', 'vs Previous month'],
+      ['1 week ago', 'vs Previous week'],
+      ['28 days ago', 'vs 4 weeks ago'],
+    ])('labels the %s time shift in English as "%s"', (shift, label) => {
+      const props = english(
+        { calculation_mode: 'time_shift', metric: 'sum_richieste', time_compare: shift },
+        [{ sum_richieste: 110, ['sum_richieste__' + shift]: 100 }],
+      );
+      expect(props.comparisonLabel).toBe(label);
+    });
+
+    it('uses English target and missing filter labels', () => {
+      expect(
+        english({ calculation_mode: 'static_target', metric: 'sum_richieste', target_static_value: '1000' }, [
+          { sum_richieste: 900 },
+        ]).comparisonLabel,
+      ).toBe('vs Target');
+      expect(
+        english({ calculation_mode: 'time_shift', metric: 'sum_richieste' }, [{ sum_richieste: 900 }])
+          .comparisonLabel,
+      ).toBe('⚠️ Requires a time filter');
+    });
+
+    it('builds the period subtitle with the English prefix', () => {
+      const closed = english(dualMetric, [{ sum_richieste: 1 }], { time_range: '2026-01-01 : 2026-06-30' });
+      expect(closed.kpiSubtitle).toBe('Period: January 2026 - June 2026');
+      const relative = english(dualMetric, [{ sum_richieste: 1 }], { extra_form_data: { time_range: 'Last 12 months' } });
+      expect(relative.kpiSubtitle).toBe('Period: 12 months');
+    });
+
+    it('shows month names found in the data in the chosen language', () => {
+      const rows = [
+        { IS_CORRENTE: 1, IS_CONFRONTO: 0, richieste: 150, MESE_CORRENTE_ETICHETTA: 'Ottobre 2026' },
+        { IS_CORRENTE: 0, IS_CONFRONTO: 1, richieste: 100, MESE_CONFRONTO_ETICHETTA: 'Ottobre 2025' },
+      ];
+      const fd = { enable_comparison: true, calculation_mode: 'anti_cartesian', metric: 'richieste' };
+      expect(english(fd, rows).comparisonLabel).toBe('vs October 2025');
+      expect(run(fd, rows).comparisonLabel).toBe('vs Ottobre 2025');
+    });
+
+    it('still recognises comparison labels written by earlier versions', () => {
+      expect(english({ ...dualMetric, comparison_label: 'vs Mese Prec.' }, monthlyRows).comparisonLabel).toBe(
+        'vs Previous month (February 2026)',
+      );
+      expect(english({ ...dualMetric, comparison_label: 'vs Confronto' }, monthlyRows).comparisonLabel).toBe(
+        'vs February 2026',
+      );
+    });
+
+    it('keeps Italian when the locale option asks for it', () => {
+      const props = run({ ...dualMetric, kpi_subtitle: '{month}', comparison_label: 'vs previous period' }, monthlyRows);
+      expect(props.kpiSubtitle).toBe('Marzo 2026');
+      expect(props.comparisonLabel).toBe('vs Febbraio 2026');
     });
   });
 });

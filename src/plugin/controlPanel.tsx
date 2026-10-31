@@ -136,6 +136,25 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'locale',
+            config: {
+              type: 'SelectControl',
+              label: t('Language of generated texts'),
+              description: t(
+                'Language of the month names, the period subtitle and the automatic comparison labels. Texts you type yourself are never translated.',
+              ),
+              default: 'en',
+              clearable: false,
+              renderTrigger: true,
+              choices: [
+                ['en', 'English'],
+                ['it', 'Italiano'],
+              ],
+            },
+          },
+        ],
+        [
+          {
             name: 'time_column',
             config: {
               ...sharedControls.groupby,

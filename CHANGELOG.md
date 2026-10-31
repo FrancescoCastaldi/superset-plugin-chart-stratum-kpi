@@ -5,6 +5,16 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-11-01
+
+### Added
+- **Language of generated texts (`locale`, default `en`)**: month names, the `Period:` subtitle, the `12 months` / `6 months` ranges and the automatic comparison labels (`vs Previous month`, `vs Same period last year`, `vs Target`, `vs Comparison`, the missing time filter warning) are now written in English. Choose `it` to keep the Italian wording of earlier versions. Texts typed in the control panel are never translated.
+- 13 new tests (204 in total).
+
+### Changed
+- Month names found in the data (for example `Ottobre 2026`) are shown in the language chosen with `locale`.
+- Comparison labels written by earlier versions (`vs Mese Prec.`, `vs Periodo Prec.`, `vs Confronto`, ...) are still recognised and resolved as before, in the chosen language. Charts saved with Italian generated text should set `locale` to `it`.
+
 ## [0.3.1] - 2026-10-29
 
 ### Fixed

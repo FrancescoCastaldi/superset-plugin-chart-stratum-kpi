@@ -1,3 +1,4 @@
+import { ENGLISH_MONTHS, ITALIAN_MONTH_NAMES, monthIndexOf } from './locale';
 import { getNumberFormatter } from '@superset-ui/core';
 
 /**
@@ -73,10 +74,7 @@ export function parseNumericValue(val: any): number | null {
   return null;
 }
 
-export const ITALIAN_MONTHS = [
-  'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
-  'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre',
-];
+export const ITALIAN_MONTHS = ITALIAN_MONTH_NAMES;
 
 export function getMetricLabel(metric: any): string {
   if (!metric) return '';
@@ -92,17 +90,21 @@ export function getMetricLabel(metric: any): string {
   );
 }
 
-export function formatMonthYearItalian(val: any): string {
+/**
+ * `Month Year` for a date, a timestamp, a `YYYY-MM` string or a text that already starts with a
+ * month name (English or Italian). Month names are written with `months`, English by default.
+ */
+export function formatMonthYear(val: any, months: string[] = ENGLISH_MONTHS): string {
   if (!val) return '';
   if (val instanceof Date) {
     if (isNaN(val.getTime())) return '';
-    return `${ITALIAN_MONTHS[val.getMonth()]} ${val.getFullYear()}`;
+    return `${months[val.getMonth()]} ${val.getFullYear()}`;
   }
   if (typeof val === 'number') {
     if (val > 100000000) {
       const d = new Date(val);
       if (!isNaN(d.getTime())) {
-        return `${ITALIAN_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+        return `${months[d.getMonth()]} ${d.getFullYear()}`;
       }
     }
     return '';
@@ -113,11 +115,9 @@ export function formatMonthYearItalian(val: any): string {
 
   const parts = trimmed.split(/\s+/);
   if (parts.length >= 2) {
-    const matchIdx = ITALIAN_MONTHS.findIndex(
-      m => m.toLowerCase() === parts[0].toLowerCase(),
-    );
+    const matchIdx = monthIndexOf(parts[0]);
     if (matchIdx !== -1) {
-      return `${ITALIAN_MONTHS[matchIdx]} ${parts.slice(1).join(' ')}`;
+      return `${months[matchIdx]} ${parts.slice(1).join(' ')}`;
     }
   }
 
@@ -126,10 +126,15 @@ export function formatMonthYearItalian(val: any): string {
     const year = m[1];
     const monthIdx = parseInt(m[2], 10) - 1;
     if (monthIdx >= 0 && monthIdx < 12) {
-      return `${ITALIAN_MONTHS[monthIdx]} ${year}`;
+      return `${months[monthIdx]} ${year}`;
     }
   }
 
   return trimmed;
 }
 
+
+/** Italian month names, kept for callers written before the `locale` option */
+export function formatMonthYearItalian(val: any): string {
+  return formatMonthYear(val, ITALIAN_MONTH_NAMES);
+}

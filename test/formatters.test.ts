@@ -1,4 +1,5 @@
 import {
+  formatMonthYear,
   formatItalianNumber,
   formatDeltaPercent,
   parseNumericValue,
@@ -133,6 +134,22 @@ describe('KPI Comparison formatters', () => {
     it('falls back to the trimmed input when no pattern matches', () => {
       expect(formatMonthYearItalian('2025-13')).toBe('2025-13');
       expect(formatMonthYearItalian('  Q3 2025  ')).toBe('Q3 2025');
+    });
+  });
+
+  describe('formatMonthYear', () => {
+    it('writes English month names by default', () => {
+      expect(formatMonthYear('2025-09')).toBe('September 2025');
+      expect(formatMonthYear(new Date(2026, 2, 1))).toBe('March 2026');
+    });
+
+    it('translates a month name found in the data, whichever language it is in', () => {
+      expect(formatMonthYear('settembre 2025')).toBe('September 2025');
+      expect(formatMonthYear('october 2025')).toBe('October 2025');
+    });
+
+    it('writes the month names it is given', () => {
+      expect(formatMonthYear('2025-09', ITALIAN_MONTHS)).toBe('Settembre 2025');
     });
   });
 

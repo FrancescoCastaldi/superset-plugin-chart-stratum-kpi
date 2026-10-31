@@ -14,11 +14,17 @@ import {
   formatDeltaPercent,
   formatItalianNumber,
   formatMetricValue,
-  formatMonthYearItalian,
+  formatMonthYear,
   getMetricLabel,
   parseNumericValue,
-  ITALIAN_MONTHS,
 } from '../utils/formatters';
+import {
+  getKpiTexts,
+  isGenericComparisonLabel,
+  isPreviousMonthLabel,
+  isVsMonthLabel,
+  monthIndexOf,
+} from '../utils/locale';
 import {
   getContrastTextColor,
   getTrendColors,
@@ -49,6 +55,9 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
       rawFd?.[snakeKey];
     return val !== undefined && val !== null ? val : defaultVal;
   };
+
+  const texts = getKpiTexts(getProp<string>('locale', 'locale', 'en'));
+  const fmtMonth = (val: any): string => formatMonthYear(val, texts.months);
 
   const data = (queriesData?.[0]?.data as Array<Record<string, any>>) || [];
 
@@ -340,7 +349,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
       if (typeof val === 'string' && val.trim()) {
         const kLow = key.toLowerCase();
         if (kLow.includes('picco') || kLow.includes('peak')) {
-          dynamicMonth = formatMonthYearItalian(val);
+          dynamicMonth = fmtMonth(val);
         } else if (
           kLow.includes('minimo') ||
           kLow.includes('minimum') ||
@@ -348,7 +357,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
           kLow.includes('più basso') ||
           kLow.includes('piu basso')
         ) {
-          dynamicMonth = formatMonthYearItalian(val);
+          dynamicMonth = fmtMonth(val);
         } else if (
           kLow.includes('corrente') ||
           (kLow.includes('ultimo') && !kLow.includes('penultimo')) ||
@@ -360,7 +369,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
           kLow === 'data_riferimento'
         ) {
           if (!dynamicMonth) {
-            dynamicMonth = formatMonthYearItalian(val);
+            dynamicMonth = fmtMonth(val);
           }
         } else if (
           kLow.includes('confronto') ||
@@ -373,7 +382,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
           kLow === 'data_confronto'
         ) {
           if (!dynamicCompMonth) {
-            dynamicCompMonth = formatMonthYearItalian(val);
+            dynamicCompMonth = fmtMonth(val);
           }
         } else if (
           kLow.includes('periodo') ||
@@ -391,7 +400,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
           kLow.includes('date')
         ) {
           if (!dynamicMonth) {
-            dynamicMonth = formatMonthYearItalian(val);
+            dynamicMonth = fmtMonth(val);
           }
         }
       }
@@ -415,7 +424,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
             kLow.includes('data') ||
             kLow.includes('periodo')
           ) {
-            dynamicCompMonth = formatMonthYearItalian(val);
+            dynamicCompMonth = fmtMonth(val);
             break;
           }
         }
@@ -453,7 +462,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
           }
         });
         if (peakRow && peakRow[dateCol]) {
-          dynamicMonth = formatMonthYearItalian(String(peakRow[dateCol]));
+          dynamicMonth = fmtMonth(String(peakRow[dateCol]));
         }
       } else if (isMin) {
         let minVal = Infinity;
@@ -466,17 +475,17 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
           }
         });
         if (minRow && minRow[dateCol]) {
-          dynamicMonth = formatMonthYearItalian(String(minRow[dateCol]));
+          dynamicMonth = fmtMonth(String(minRow[dateCol]));
         }
       } else {
         const lastRow = data[data.length - 1];
         if (lastRow && lastRow[dateCol]) {
-          dynamicMonth = formatMonthYearItalian(String(lastRow[dateCol]));
+          dynamicMonth = fmtMonth(String(lastRow[dateCol]));
         }
         if (data.length > 1) {
           const prevRow = data[data.length - 2];
           if (prevRow && prevRow[dateCol]) {
-            dynamicCompMonth = formatMonthYearItalian(String(prevRow[dateCol]));
+            dynamicCompMonth = fmtMonth(String(prevRow[dateCol]));
           }
         }
       }
@@ -489,8 +498,8 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
       /(\d{4}-\d{2}-\d{2})\s*:\s*(\d{4}-\d{2}-\d{2})?/,
     );
     if (rangeMatch) {
-      const startFmt = formatMonthYearItalian(rangeMatch[1]);
-      const endFmt = rangeMatch[2] ? formatMonthYearItalian(rangeMatch[2]) : null;
+      const startFmt = fmtMonth(rangeMatch[1]);
+      const endFmt = rangeMatch[2] ? fmtMonth(rangeMatch[2]) : null;
       if (!dynamicPeriod) {
         dynamicPeriod = endFmt ? `${startFmt} - ${endFmt}` : `dal ${startFmt}`;
       }
@@ -498,16 +507,16 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
         dynamicMonth = endFmt;
       }
     } else if (activeTimeRange.toLowerCase().includes('last 12 months')) {
-      if (!dynamicPeriod) dynamicPeriod = '12 mesi';
+      if (!dynamicPeriod) dynamicPeriod = texts.twelveMonths;
     } else if (activeTimeRange.toLowerCase().includes('last 6 months')) {
-      if (!dynamicPeriod) dynamicPeriod = '6 mesi';
+      if (!dynamicPeriod) dynamicPeriod = texts.sixMonths;
     }
   }
 
   // 4. Heuristic fallback for dynamicCompMonth when comparing to previous month
   if (!dynamicCompMonth) {
     const rawCompLabel = (getProp<string | undefined>('comparisonLabel', 'comparison_label', '') || '').toLowerCase();
-    const isMesePrecTarget =
+    const isPreviousMonthTarget =
       rawCompLabel.includes('mese prec') ||
       rawCompLabel.includes('previous month') ||
       rawCompLabel.includes('precedente') ||
@@ -519,12 +528,12 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
         comparisonMetricKey.toLowerCase().includes('prev')
       ));
 
-    if (isMesePrecTarget) {
+    if (isPreviousMonthTarget) {
       let anchorDate = new Date();
       if (dynamicMonth) {
         const parts = dynamicMonth.split(' ');
         if (parts.length >= 2) {
-          const mIdx = ITALIAN_MONTHS.findIndex(m => m.toLowerCase() === parts[0].toLowerCase());
+          const mIdx = monthIndexOf(parts[0]);
           const y = parseInt(parts[1], 10);
           if (mIdx !== -1 && !isNaN(y)) {
             anchorDate = new Date(y, mIdx, 1);
@@ -532,7 +541,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
         }
       }
       const prevDate = new Date(anchorDate.getFullYear(), anchorDate.getMonth() - 1, 1);
-      dynamicCompMonth = `${ITALIAN_MONTHS[prevDate.getMonth()]} ${prevDate.getFullYear()}`;
+      dynamicCompMonth = `${texts.months[prevDate.getMonth()]} ${prevDate.getFullYear()}`;
     }
   }
 
@@ -548,7 +557,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
   }
 
   if (!dynamicSubtitle && activeTimeRange && activeTimeRange !== 'No filter') {
-    dynamicSubtitle = `Periodo: ${dynamicPeriod || activeTimeRange}`;
+    dynamicSubtitle = `${texts.period}: ${dynamicPeriod || activeTimeRange}`;
   } else if (dynamicSubtitle) {
     if (dynamicPeriod) {
       dynamicSubtitle = dynamicSubtitle.replace(/{period}|{periodo}/gi, dynamicPeriod);
@@ -584,58 +593,46 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
         .replace(/{comp_month}|{mese_prec}/gi, dynamicCompMonth)
         .replace(/{month}|{mese}/gi, dynamicCompMonth);
     } else if (
-      resolvedComparisonLabel && (
-        resolvedComparisonLabel === 'vs Mese precedente' ||
-        resolvedComparisonLabel === 'vs previous month' ||
-        resolvedComparisonLabel === 'vs Mese Prec.' ||
-        resolvedComparisonLabel === 'vs Mese Prec' ||
-        resolvedComparisonLabel === 'vs mese precedente' ||
-        resolvedComparisonLabel.startsWith('vs Mese precedente') ||
-        resolvedComparisonLabel.startsWith('vs Mese Prec')
-      )
+      resolvedComparisonLabel && isPreviousMonthLabel(resolvedComparisonLabel)
     ) {
-      resolvedComparisonLabel = `vs Mese precedente (${dynamicCompMonth})`;
+      resolvedComparisonLabel = `${texts.vsPreviousMonth} (${dynamicCompMonth})`;
     } else if (
       !resolvedComparisonLabel ||
-      resolvedComparisonLabel === 'vs Periodo Prec.' ||
-      resolvedComparisonLabel === 'vs previous period' ||
-      resolvedComparisonLabel === 'vs Confronto' ||
-      resolvedComparisonLabel.startsWith('vs Agosto') ||
-      resolvedComparisonLabel.startsWith('vs Settembre')
+      isGenericComparisonLabel(resolvedComparisonLabel) ||
+      isVsMonthLabel(resolvedComparisonLabel)
     ) {
       resolvedComparisonLabel = `vs ${dynamicCompMonth}`;
     }
   } else if (
     !resolvedComparisonLabel ||
-    resolvedComparisonLabel === 'vs Periodo Prec.' ||
-    resolvedComparisonLabel === 'vs previous period' ||
+    isGenericComparisonLabel(resolvedComparisonLabel) ||
     resolvedComparisonLabel === 'vs Benchmark'
   ) {
     if (calculationMode === 'anti_cartesian') {
       if (dynamicCompMonth) {
         resolvedComparisonLabel = `vs ${dynamicCompMonth}`;
       } else {
-        resolvedComparisonLabel = 'vs Periodo Confronto';
+        resolvedComparisonLabel = texts.vsComparisonPeriod;
       }
     } else if (calculationMode === 'static_target') {
-      resolvedComparisonLabel = 'vs Obiettivo';
+      resolvedComparisonLabel = texts.vsTarget;
     } else if (calculationMode === 'time_shift') {
       if (comparisonValue === null) {
-        resolvedComparisonLabel = '⚠️ Richiede Filtro Temporale';
+        resolvedComparisonLabel = texts.requiresTimeFilter;
       } else {
         const shift = getProp<string>('timeCompare', 'time_compare', '1 year ago');
         switch (shift) {
           case '1 year ago':
-            resolvedComparisonLabel = 'vs Stesso Periodo Anno Prec.';
+            resolvedComparisonLabel = texts.vsSamePeriodLastYear;
             break;
           case '1 month ago':
-            resolvedComparisonLabel = 'vs Mese Prec.';
+            resolvedComparisonLabel = texts.vsPreviousMonthShift;
             break;
           case '1 week ago':
-            resolvedComparisonLabel = 'vs Settimana Prec.';
+            resolvedComparisonLabel = texts.vsPreviousWeek;
             break;
           case '28 days ago':
-            resolvedComparisonLabel = 'vs 4 Settimane Fa';
+            resolvedComparisonLabel = texts.vsFourWeeksAgo;
             break;
           default:
             resolvedComparisonLabel = `vs ${shift}`;
@@ -647,7 +644,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
     ) {
       resolvedComparisonLabel = `vs ${comparisonMetricKey}`;
     } else {
-      resolvedComparisonLabel = 'vs Confronto';
+      resolvedComparisonLabel = texts.vsComparison;
     }
   }
 

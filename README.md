@@ -200,6 +200,7 @@ Open `http://localhost:8088`, create a new chart and select **KPI Comparison Car
 | | `comparison_metric` | Comparison metric (optional) | Metric | (none) | Baseline or target metric in dual metric mode (e.g. `SUM(prior_visits)`). |
 | | `time_compare` | Time offset (time shift) | Select | `1 year ago` | Temporal offset (`1 year ago`, `1 month ago`, `1 week ago`, `28 days ago`). |
 | | `comparison_label` | Comparison period label | Text | `"vs previous period"` | Descriptive benchmark text (e.g. `"vs 2025"`, `"vs Target"`). |
+| | `locale` | Language of generated texts | Select | `en` | Language of the month names, the `Period:` subtitle and the automatic comparison labels (`en` or `it`). Texts you type are never translated. |
 | | `time_column` | Time column (optional, for the sparkline) | Select | (none) | Date or time column used to order the sparkline. |
 | **Card appearance** | `kpi_title` | KPI title | Text | `""` | Top uppercase heading (e.g. `"TOTAL VISITS"`). |
 | | `show_title` | Show top title | Checkbox | `true` | Toggles the top title label. |
