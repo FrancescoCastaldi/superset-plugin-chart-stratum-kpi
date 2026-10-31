@@ -5,6 +5,12 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-11-01
+
+### Fixed
+- **Comparison label with a dashboard filter**: when a dashboard filter such as the Calendar Filter sends its comparison period, in `time_shift` mode the label now names that period (`vs 2007-01-01 : 2008-01-01`) instead of the chart's own shift (`vs 1 year ago`). A time shift saved as a list is also read correctly.
+- 1 new test (205 in total).
+
 ## [0.4.0] - 2026-11-01
 
 ### Added

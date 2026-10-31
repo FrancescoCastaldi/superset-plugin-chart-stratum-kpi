@@ -297,6 +297,17 @@ describe('KPI Comparison transformProps', () => {
       expect(props.comparisonLabel).toBe(label);
     });
 
+    it('names the comparison period sent by a dashboard filter', () => {
+      const range = '2007-01-01 : 2008-01-01';
+      const props = run(
+        { calculation_mode: 'time_shift', metric: 'sum_richieste', time_compare: ['1 year ago'] },
+        [{ sum_richieste: 110, [`sum_richieste__${range}`]: 100 }],
+        { extra_form_data: { time_range: '2008-01-01 : 2009-01-01', time_compare: [range] } },
+      );
+      expect(props.comparisonValue).toBe(100);
+      expect(props.comparisonLabel).toBe(`vs ${range}`);
+    });
+
     it('uses the second row in time_shift mode when no offset column exists', () => {
       const props = run({ calculation_mode: 'time_shift', metric: 'sum_richieste' }, [
         { sum_richieste: 110 },

@@ -620,7 +620,12 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
       if (comparisonValue === null) {
         resolvedComparisonLabel = texts.requiresTimeFilter;
       } else {
-        const shift = getProp<string>('timeCompare', 'time_compare', '1 year ago');
+        // A dashboard filter (the calendar filter) sends its comparison period as an explicit range
+        const dashboardShift = ([] as unknown[])
+          .concat(rawFd.extra_form_data?.time_compare ?? rawFd.extraFormData?.time_compare ?? [])
+          .find((v): v is string => typeof v === 'string' && v.trim() !== '');
+        const chartShift = getProp<string | string[]>('timeCompare', 'time_compare', '1 year ago');
+        const shift: string = dashboardShift || (Array.isArray(chartShift) ? String(chartShift[0] ?? '1 year ago') : chartShift);
         switch (shift) {
           case '1 year ago':
             resolvedComparisonLabel = texts.vsSamePeriodLastYear;
