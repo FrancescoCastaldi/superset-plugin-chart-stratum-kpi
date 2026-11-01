@@ -9,6 +9,8 @@ export interface DashboardPeriods {
   comparisonName?: string;
   referenceText?: string;
   comparisonText?: string;
+  /** Language of the texts, the one chosen in the filter */
+  locale?: 'en' | 'it';
 }
 
 const clean = (value: unknown): string | undefined =>
@@ -19,7 +21,7 @@ export function readDashboardPeriods(extraFormData: unknown): DashboardPeriods {
   const info = ([] as unknown[])
     .concat(custom ?? [])
     .find(
-      (v): v is { period_labels?: Record<string, unknown>; period_text?: Record<string, unknown> } =>
+      (v): v is { period_labels?: Record<string, unknown>; period_text?: Record<string, unknown>; locale?: unknown } =>
         Boolean(v) && typeof v === 'object' && ('period_labels' in (v as object) || 'period_text' in (v as object)),
     );
   return {
@@ -27,6 +29,7 @@ export function readDashboardPeriods(extraFormData: unknown): DashboardPeriods {
     comparisonName: clean(info?.period_labels?.comparison),
     referenceText: clean(info?.period_text?.reference),
     comparisonText: clean(info?.period_text?.comparison),
+    locale: (info as { locale?: unknown } | undefined)?.locale === 'it' ? 'it' : info ? 'en' : undefined,
   };
 }
 
@@ -34,4 +37,10 @@ export function readDashboardPeriods(extraFormData: unknown): DashboardPeriods {
 export function periodTitle(name?: string, text?: string, fallback?: string): string | undefined {
   if (name && text) return `${name} · ${text}`;
   return name || text || fallback;
+}
+
+/** Marks a period whose query returned no data, in the language of the filter */
+export function withNoData(title: string | undefined, locale?: 'en' | 'it'): string | undefined {
+  if (!title) return title;
+  return `${title} · ${locale === 'it' ? 'nessun dato' : 'no data'}`;
 }

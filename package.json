@@ -1,6 +1,6 @@
 {
   "name": "superset-plugin-chart-kpi-comparison",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "StratumKPI: All-in-One KPI Card with Temporal & Dual Metric Delta % for Apache Superset",
   "homepage": "https://github.com/FrancescoCastaldi/superset-plugin-chart-kpi-comparison",
   "repository": {

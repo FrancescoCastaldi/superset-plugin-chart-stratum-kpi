@@ -325,6 +325,22 @@ describe('KPI Comparison transformProps', () => {
       expect(props.kpiSubtitle).toBe('Periodo: 1 Jan - 31 Mar 2008');
     });
 
+    it('says the comparison period is empty instead of asking for a time filter', () => {
+      const range = '2008-04-01 : 2008-07-01';
+      const props = run(
+        { calculation_mode: 'time_shift', metric: 'sum_richieste', time_compare: ['1 year ago'], locale: 'en' },
+        [{ sum_richieste: 110, [`sum_richieste__${range}`]: null }],
+        {
+          extra_form_data: {
+            time_range: '2008-01-01 : 2008-04-01',
+            time_compare: [range],
+            custom_form_data: [{ period_labels: { reference: 'Q1', comparison: 'Q2' }, period_text: { reference: '1 Jan - 31 Mar 2008', comparison: '1 Apr - 30 Jun 2008' }, locale: 'en' }],
+          },
+        },
+      );
+      expect(props.comparisonLabel).toBe('vs Q2 · 1 Apr - 30 Jun 2008 · no data');
+    });
+
     it('uses the second row in time_shift mode when no offset column exists', () => {
       const props = run({ calculation_mode: 'time_shift', metric: 'sum_richieste' }, [
         { sum_richieste: 110 },

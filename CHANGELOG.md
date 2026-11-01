@@ -5,6 +5,12 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-11-01
+
+### Fixed
+- **Empty comparison period**: when a dashboard filter sends a comparison period that holds no data, the label reads `vs <period> · no data` (`nessun dato` in Italian) instead of the misleading "Requires a time filter".
+- 2 new tests (212 in total).
+
 ## [0.5.0] - 2026-11-01
 
 ### Added

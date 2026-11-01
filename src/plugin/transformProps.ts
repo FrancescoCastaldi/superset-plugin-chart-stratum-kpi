@@ -18,7 +18,7 @@ import {
   getMetricLabel,
   parseNumericValue,
 } from '../utils/formatters';
-import { periodTitle, readDashboardPeriods } from '../utils/dashboardPeriods';
+import { periodTitle, readDashboardPeriods, withNoData } from '../utils/dashboardPeriods';
 import {
   getKpiTexts,
   isGenericComparisonLabel,
@@ -620,7 +620,16 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
     } else if (calculationMode === 'static_target') {
       resolvedComparisonLabel = texts.vsTarget;
     } else if (calculationMode === 'time_shift') {
-      if (comparisonValue === null) {
+      const sentByDashboard = ([] as unknown[])
+        .concat(rawFd.extra_form_data?.time_compare ?? rawFd.extraFormData?.time_compare ?? [])
+        .some(v => typeof v === 'string' && v.trim() !== '');
+      if (comparisonValue === null && sentByDashboard) {
+        // The dashboard sent a period but it holds no data: say so instead of asking for a time filter
+        resolvedComparisonLabel = `vs ${withNoData(
+          periodTitle(dashboardPeriods.comparisonName, dashboardPeriods.comparisonText, texts.vsComparisonPeriod.replace(/^vs /, '')),
+          dashboardPeriods.locale ?? (getProp<string>('locale', 'locale', 'en') === 'it' ? 'it' : 'en'),
+        )}`;
+      } else if (comparisonValue === null) {
         resolvedComparisonLabel = texts.requiresTimeFilter;
       } else {
         // A dashboard filter (the calendar filter) sends its comparison period as an explicit range
