@@ -73,6 +73,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
   comparisonColor = '',
   showProgressBar = false,
   targetProgressPercent = null,
+  targetProgressSuffix,
   applyTrendColorTo = 'badge',
   clickUrl = '',
   clickTarget = '_self',
@@ -690,7 +691,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
               fontWeight: 500,
             }}
           >
-            {targetProgressPercent > 100 ? '>100%' : `${Math.round(targetProgressPercent)}%`} del Target
+            {targetProgressPercent > 100 ? '>100%' : `${Math.round(targetProgressPercent)}%`} {targetProgressSuffix ?? 'of target'}
           </div>
         </div>
       )}

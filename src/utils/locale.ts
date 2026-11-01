@@ -8,6 +8,10 @@ export interface KpiTexts {
   months: string[];
   /** Prefix of the subtitle built from the active time range */
   period: string;
+  /** `of target` next to a progress bar */
+  ofTarget: string;
+  /** Badge for a comparison that was zero */
+  newBadge: string;
   /** Open range such as `from January 2026` */
   from: string;
   vsPreviousMonth: string;
@@ -38,6 +42,8 @@ export const ITALIAN_MONTH_NAMES = [
 const EN: KpiTexts = {
   months: ENGLISH_MONTHS,
   period: 'Period',
+  ofTarget: 'of target',
+  newBadge: 'New',
   from: 'from',
   vsPreviousMonth: 'vs Previous month',
   vsPreviousMonthShift: 'vs Previous month',
@@ -56,6 +62,8 @@ const EN: KpiTexts = {
 const IT: KpiTexts = {
   months: ITALIAN_MONTH_NAMES,
   period: 'Periodo',
+  ofTarget: 'del Target',
+  newBadge: 'Nuovo',
   from: 'dal',
   vsPreviousMonth: 'vs Mese precedente',
   vsPreviousMonthShift: 'vs Mese Prec.',

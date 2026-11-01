@@ -107,6 +107,7 @@ describe('KPI Comparison transformProps', () => {
         sparklineShowPoints: false,
         showProgressBar: false,
         targetProgressPercent: null,
+        targetProgressSuffix: 'del Target',
         applyTrendColorTo: 'badge',
         clickUrl: '',
         clickTarget: '_self',
@@ -375,7 +376,7 @@ describe('KPI Comparison transformProps', () => {
   });
 
   describe('delta, polarity and badge colors', () => {
-    it('reports Nuovo badge when the comparison is zero and the primary is positive', () => {
+    it('reports the new badge (Nuovo with locale it) when the comparison is zero and the primary is positive', () => {
       const props = run(dualMetric, [{ sum_richieste: 5, sum_richieste_conf: 0 }]);
       expect(props.deltaPercent).toBeNull();
       expect(props.formattedDeltaPercent).toBe('Nuovo');
@@ -862,6 +863,16 @@ describe('KPI Comparison transformProps', () => {
       expect(english({ ...dualMetric, comparison_label: 'vs Confronto' }, monthlyRows).comparisonLabel).toBe(
         'vs February 2026',
       );
+    });
+
+    it('writes numbers and the progress text the English way by default', () => {
+      const props = english(
+        { calculation_mode: 'static_target', metric: 'sum_richieste', target_static_value: '3000000', show_progress_bar: true, enable_comparison: true, show_absolute_delta: true },
+        [{ sum_richieste: 10032628.85 }],
+      );
+      expect(props.formattedDeltaPercent).toBe('+234.4%');
+      expect(props.formattedDeltaAbsolute).toBe('+7,032,629');
+      expect(props.targetProgressSuffix).toBe('of target');
     });
 
     it('keeps Italian when the locale option asks for it', () => {

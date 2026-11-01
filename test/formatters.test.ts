@@ -1,4 +1,5 @@
 import {
+  formatNumberLocale,
   formatMonthYear,
   formatItalianNumber,
   formatDeltaPercent,
@@ -134,6 +135,15 @@ describe('KPI Comparison formatters', () => {
     it('falls back to the trimmed input when no pattern matches', () => {
       expect(formatMonthYearItalian('2025-13')).toBe('2025-13');
       expect(formatMonthYearItalian('  Q3 2025  ')).toBe('Q3 2025');
+    });
+  });
+
+  describe('formatNumberLocale', () => {
+    it('writes English separators for en and Italian ones for it', () => {
+      expect(formatNumberLocale(1234567.891, 1, 'en')).toBe('1,234,567.9');
+      expect(formatNumberLocale(1234567.891, 1, 'it')).toBe('1.234.567,9');
+      expect(formatNumberLocale(1234, 0)).toBe('1.234');
+      expect(formatNumberLocale(null, 0, 'en')).toBe('—');
     });
   });
 

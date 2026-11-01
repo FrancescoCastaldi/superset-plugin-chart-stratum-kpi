@@ -18,16 +18,33 @@ export function formatItalianNumber(value: number | null | undefined, decimals: 
   return parts[0];
 }
 
+/** Same as `formatItalianNumber` for `it`; comma as thousands separator and dot as decimal for `en` */
+export function formatNumberLocale(
+  value: number | null | undefined,
+  decimals: number = 0,
+  locale: 'en' | 'it' = 'it',
+): string {
+  if (locale === 'it') return formatItalianNumber(value, decimals);
+  if (value === null || value === undefined || isNaN(value)) return '—';
+  const parts = value.toFixed(decimals).split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.join('.');
+}
+
 /**
  * Format a percentage value with sign (+/-) and 1 or 2 decimals.
  */
-export function formatDeltaPercent(value: number | null | undefined, decimals: number = 1): string {
+export function formatDeltaPercent(
+  value: number | null | undefined,
+  decimals: number = 1,
+  locale: 'en' | 'it' = 'it',
+): string {
   if (value === null || value === undefined || isNaN(value)) {
     return '—%';
   }
 
   const sign = value > 0 ? '+' : value < 0 ? '' : '';
-  const formatted = formatItalianNumber(value, decimals);
+  const formatted = formatNumberLocale(value, decimals, locale);
   return `${sign}${formatted}%`;
 }
 
@@ -37,6 +54,7 @@ export function formatDeltaPercent(value: number | null | undefined, decimals: n
 export function formatMetricValue(
   value: number | null | undefined,
   formatString?: string,
+  locale: 'en' | 'it' = 'it',
 ): string {
   if (value === null || value === undefined || isNaN(value)) {
     return '—';
@@ -53,7 +71,7 @@ export function formatMetricValue(
 
   // Automatic heuristic: if integer, 0 decimals; if float, 2 decimals
   const isInteger = Math.abs(value % 1) < 0.0001;
-  return formatItalianNumber(value, isInteger ? 0 : 2);
+  return formatNumberLocale(value, isInteger ? 0 : 2, locale);
 }
 
 /**

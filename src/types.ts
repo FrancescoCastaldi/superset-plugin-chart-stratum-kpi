@@ -171,6 +171,8 @@ export interface KPIComparisonProps {
   // Target Tracking
   showProgressBar?: boolean;
   targetProgressPercent?: number | null;
+  /** Text after the progress percentage (`of target`) */
+  targetProgressSuffix?: string;
 
   // Interactivity & Theming
   applyTrendColorTo?: 'badge' | 'text' | 'background';

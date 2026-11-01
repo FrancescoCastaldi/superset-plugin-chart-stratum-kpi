@@ -8,31 +8,31 @@
 
 **StratumKPI** (KPI Comparison Card) is a custom visualization plugin for **Apache Superset** that displays an all-in-one, high-impact executive summary card. It combines the primary reference metric, a period-over-period or budget benchmark, the absolute difference, the automated percentage variance ($\Delta\%$), semantic trend badges, color polarity inversion and an integrated vector sparkline.
 
-![KPI Comparison Dev Studio Live Demo](docs/images/dev_studio_demo.gif)
+![StratumKPI card styles](docs/images/demo.gif)
 
-*Live Dev Studio: interactive workbench with real-time Explore control panel synchronization, typography settings (font family, weight, tabular numbers), cubic Bezier sparklines, inverted polarity and hot module reloading.*
+*Recorded in Chrome on a running Superset: the same card with a comparison against last year, an inverted polarity, a target with a progress bar, a card style and large typography.*
 
 ---
 
 ## 📸 Visual Preview
 
-### 🖥️ Live Production Dashboard Showcase
+### 🖥️ Screenshots from Superset
 
-![KPI Comparison Live Dashboard Showcase](docs/images/live_dashboard_showcase.png)
+![StratumKPI orders against last year](docs/images/live_dashboard_showcase.png)
 
-*Figure 1: KPI Comparison Card rendered on Apache Superset against a benchmark, with an automated +2.9% (+222,056) delta, a trend indicator and the comparison metric.*
+*Figure 1: Orders from January to June 2005 against the same period of 2004 (Superset's example sales data): the value, the change in percent and in units, and the comparison value.*
 
-### 🔍 Isolated Component Showcase & Dev Studio
+### 🔍 Card variants
 
-![KPI Comparison Card Workbench](docs/images/kpi_comparison_preview.png)
+![StratumKPI target with progress bar](docs/images/kpi_comparison_preview.png)
 
-*Figure 2: KPI Comparison Card in the Dev Studio: a +10.8% delta, the Inter font, tabular numbers, a dual delta and a smooth cubic Bezier sparkline.*
+*Figure 2: Revenue against a fixed target, with a progress bar that shows how far past the target the value is.*
 
 <p align="center">
-  <img src="docs/images/kpi_card_showcase.png" alt="KPI Comparison Card Isolated Preview" width="460" />
+  <img src="docs/images/kpi_card_showcase.png" alt="StratumKPI card style" width="460" />
 </p>
 
-*Figure 3: Close-up view of the rendered KPI Comparison Card component.*
+*Figure 3: A card style with a tinted background, rounded corners and a shadow. More variants: [inverted polarity](docs/images/02_inverted_polarity.png) (a price going down is good news) and [typography](docs/images/typography.png).*
 
 ---
 

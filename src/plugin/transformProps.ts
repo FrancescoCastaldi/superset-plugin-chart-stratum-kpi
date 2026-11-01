@@ -12,7 +12,7 @@ import {
 } from '../types';
 import {
   formatDeltaPercent,
-  formatItalianNumber,
+  formatNumberLocale,
   formatMetricValue,
   formatMonthYear,
   getMetricLabel,
@@ -57,7 +57,8 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
     return val !== undefined && val !== null ? val : defaultVal;
   };
 
-  const texts = getKpiTexts(getProp<string>('locale', 'locale', 'en'));
+  const kpiLocale: 'en' | 'it' = getProp<string>('locale', 'locale', 'en') === 'it' ? 'it' : 'en';
+  const texts = getKpiTexts(kpiLocale);
   const fmtMonth = (val: any): string => formatMonthYear(val, texts.months);
 
   const data = (queriesData?.[0]?.data as Array<Record<string, any>>) || [];
@@ -275,17 +276,17 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
 
   // Format strings
   const numberFormat = getProp<string | undefined>('numberFormat', 'number_format', undefined);
-  const formattedPrimary = formatMetricValue(primaryValue, numberFormat);
-  const formattedComparison = formatMetricValue(comparisonValue, numberFormat);
-  let formattedDeltaPercent = formatDeltaPercent(deltaPercent, 1);
+  const formattedPrimary = formatMetricValue(primaryValue, numberFormat, kpiLocale);
+  const formattedComparison = formatMetricValue(comparisonValue, numberFormat, kpiLocale);
+  let formattedDeltaPercent = formatDeltaPercent(deltaPercent, 1, kpiLocale);
   let formattedDeltaAbsolute =
     deltaAbsolute !== null
-      ? `${deltaAbsolute > 0 ? '+' : ''}${formatItalianNumber(deltaAbsolute, 0)}`
+      ? `${deltaAbsolute > 0 ? '+' : ''}${formatNumberLocale(deltaAbsolute, 0, kpiLocale)}`
       : '—';
 
   // Zero baseline badge and neutral styling
   if (delta.isZeroBaseline && primaryValue !== null && primaryValue > 0) {
-    formattedDeltaPercent = 'Nuovo';
+    formattedDeltaPercent = texts.newBadge;
     trendDirection = 'none';
     badgeBackgroundColor = '#f1f5f9';
     badgeTextColor = '#64748b';
@@ -305,7 +306,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
         const totalValue = parseNumericValue(data[0][totalMetricKey]);
         if (totalValue !== null && totalValue !== 0) {
           const pct = (primaryValue / totalValue) * 100;
-          formattedDeltaPercent = `${formatItalianNumber(pct, 1)}%`;
+          formattedDeltaPercent = `${formatNumberLocale(pct, 1, kpiLocale)}%`;
           formattedDeltaAbsolute = '—'; // Hide absolute delta
           trendDirection = 'none'; // Hide trend arrow
           hasPercentOfTotal = true;
@@ -870,6 +871,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
     sparklineShowPoints,
     showProgressBar,
     targetProgressPercent,
+    targetProgressSuffix: texts.ofTarget,
     applyTrendColorTo: getProp<'badge' | 'text' | 'background'>('applyTrendColorTo', 'apply_trend_color_to', 'badge'),
     clickUrl: getProp<string>('clickUrl', 'click_url', ''),
     clickTarget: getProp<'_blank' | '_self'>('clickTarget', 'click_target', '_self'),
