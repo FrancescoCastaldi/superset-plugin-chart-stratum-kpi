@@ -214,14 +214,14 @@ const config: ControlPanelConfig = {
             name: 'badge_content',
             config: {
               type: 'SelectControl',
-              label: t('Contenuto del Badge (In alto a destra)'),
+              label: t('Badge content (top right)'),
               default: 'delta',
               choices: [
                 ['delta', t('Delta vs previous period')],
                 ['percent_of_total', t('% of total')],
                 ['none', t('No badge')],
               ],
-              description: t('Cosa mostrare nel badge colorato in alto a destra.'),
+              description: t('What to show in the colored badge at the top right.'),
               renderTrigger: true,
               clearable: false,
             },
@@ -341,9 +341,9 @@ const config: ControlPanelConfig = {
               label: t('Content alignment'),
               default: 'left',
               choices: [
-                ['left', t('Allinea a Sinistra')],
+                ['left', t('Align left')],
                 ['center', t('Centrato')],
-                ['right', t('Allinea a Destra')],
+                ['right', t('Align right')],
               ],
               clearable: false,
               renderTrigger: true,
@@ -375,7 +375,7 @@ const config: ControlPanelConfig = {
             name: 'number_format',
             config: {
               ...sharedControls.y_axis_format,
-              label: t('Formattazione Numero'),
+              label: t('Number format'),
               default: 'SMART_NUMBER',
               renderTrigger: true,
             },
@@ -395,7 +395,7 @@ const config: ControlPanelConfig = {
               label: t('Clean card mode (no box-in-box)'),
               default: false,
               description: t(
-                'Azzera padding interno, bordi e ombre ridondanti per integrarsi perfettamente nei box standard di Superset.',
+                'Removes inner padding, borders and redundant shadows so the card blends into standard Superset boxes.',
               ),
               renderTrigger: true,
             },
@@ -470,7 +470,7 @@ const config: ControlPanelConfig = {
               label: t('Border width'),
               default: 1,
               choices: [
-                [1, t('1 pixel (Fine)')],
+                [1, t('1 pixel (thin)')],
                 [2, t('2 pixels (medium)')],
                 [3, t('3 pixel (Evidente)')],
               ],
@@ -567,7 +567,7 @@ const config: ControlPanelConfig = {
               choices: [
                 ['tight', t('Stretta (-0.025em)')],
                 ['normal', t('Normal (0em)')],
-                ['wide', t('Larga (+0.04em)')],
+                ['wide', t('Wide (+0.04em)')],
               ],
               clearable: false,
               renderTrigger: true,
@@ -595,7 +595,7 @@ const config: ControlPanelConfig = {
               default: 'auto',
               choices: [
                 ['auto', t('Scalato Dinamico')],
-                ['small', t('Compatto (11px)')],
+                ['small', t('Compact (11px)')],
                 ['medium', t('Medium (13px)')],
                 ['large', t('Large (15px)')],
               ],
@@ -628,7 +628,7 @@ const config: ControlPanelConfig = {
               label: t('Title text transform'),
               default: 'uppercase',
               choices: [
-                ['uppercase', t('Tutto Maiuscolo (UPPERCASE)')],
+                ['uppercase', t('All caps (UPPERCASE)')],
                 ['capitalize', t('Iniziali Maiuscole (Capitalize)')],
                 ['none', t('As entered (none)')],
               ],
@@ -643,7 +643,7 @@ const config: ControlPanelConfig = {
               label: t('Comparison row size'),
               default: 'small',
               choices: [
-                ['small', t('Compatto')],
+                ['small', t('Compact')],
                 ['medium', t('Medium')],
                 ['large', t('Large')],
               ],
@@ -695,12 +695,12 @@ const config: ControlPanelConfig = {
             name: 'badge_position',
             config: {
               type: 'SelectControl',
-              label: t('Posizione del Badge Delta'),
+              label: t('Delta badge position'),
               default: 'bottom_left',
               choices: [
                 ['bottom_left', t('Bottom, with comparison (default)')],
                 ['inline_right', t('Beside the main value')],
-                ['top_right', t('In alto a destra')],
+                ['top_right', t('Top right')],
               ],
               clearable: false,
               renderTrigger: true,
@@ -715,7 +715,7 @@ const config: ControlPanelConfig = {
             name: 'badge_style',
             config: {
               type: 'SelectControl',
-              label: t('Stile Grafico Badge Delta'),
+              label: t('Delta badge style'),
               default: 'pill',
               choices: [
                 ['pill', t('Rounded pill (prominent)')],
@@ -793,7 +793,7 @@ const config: ControlPanelConfig = {
               label: t('Apply trend color to:'),
               default: 'badge',
               choices: [
-                ['badge', t('Solo Badge (In alto a dx)')],
+                ['badge', t('Badge only (top right)')],
                 ['text', t('Main value text')],
                 ['background', t('Whole card background (gradient)')],
               ],
@@ -815,7 +815,7 @@ const config: ControlPanelConfig = {
             name: 'click_url',
             config: {
               type: 'TextControl',
-              label: t('URL di Navigazione (Drill-through)'),
+              label: t('Navigation URL (drill-through)'),
               default: '',
               description: t('Enter a link (e.g. /superset/dashboard/123). Makes the whole card clickable.'),
               renderTrigger: true,
@@ -830,8 +830,8 @@ const config: ControlPanelConfig = {
               label: t('Link behaviour'),
               default: '_self',
               choices: [
-                ['_self', t('Apri nella stessa finestra')],
-                ['_blank', t('Apri in una nuova scheda')],
+                ['_self', t('Open in the same window')],
+                ['_blank', t('Open in a new tab')],
               ],
               clearable: false,
               renderTrigger: true,
@@ -870,7 +870,7 @@ const config: ControlPanelConfig = {
             name: 'sparkline_fill',
             config: {
               type: 'CheckboxControl',
-              label: t('Sfumatura di Riempimento'),
+              label: t('Fill gradient'),
               default: true,
               renderTrigger: true,
             },
