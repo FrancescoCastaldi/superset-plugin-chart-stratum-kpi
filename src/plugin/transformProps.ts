@@ -18,6 +18,7 @@ import {
   getMetricLabel,
   parseNumericValue,
 } from '../utils/formatters';
+import { periodTitle, readDashboardPeriods } from '../utils/dashboardPeriods';
 import {
   getKpiTexts,
   isGenericComparisonLabel,
@@ -341,7 +342,9 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
   // --- Dynamic Month & Period Discovery ---
   let dynamicMonth: string | null = null;
   let dynamicCompMonth: string | null = null;
-  let dynamicPeriod: string | null = null;
+  // Names and readable ranges of the periods when a dashboard filter (the Calendar Filter) chose them
+  const dashboardPeriods = readDashboardPeriods(rawFd.extra_form_data ?? rawFd.extraFormData ?? (fd as any).extra_form_data);
+  let dynamicPeriod: string | null = dashboardPeriods.referenceText ?? null;
 
   // 1. Inspect referenceRow for explicit string metrics or date columns
   if (referenceRow) {
@@ -501,7 +504,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
       const startFmt = fmtMonth(rangeMatch[1]);
       const endFmt = rangeMatch[2] ? fmtMonth(rangeMatch[2]) : null;
       if (!dynamicPeriod) {
-        dynamicPeriod = endFmt ? `${startFmt} - ${endFmt}` : `dal ${startFmt}`;
+        dynamicPeriod = endFmt ? `${startFmt} - ${endFmt}` : `${texts.from} ${startFmt}`;
       }
       if (!dynamicMonth && endFmt) {
         dynamicMonth = endFmt;
@@ -626,7 +629,13 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
           .find((v): v is string => typeof v === 'string' && v.trim() !== '');
         const chartShift = getProp<string | string[]>('timeCompare', 'time_compare', '1 year ago');
         const shift: string = dashboardShift || (Array.isArray(chartShift) ? String(chartShift[0] ?? '1 year ago') : chartShift);
-        switch (shift) {
+        const dashboardTitle = dashboardShift
+          ? periodTitle(dashboardPeriods.comparisonName, dashboardPeriods.comparisonText)
+          : undefined;
+        switch (dashboardTitle ? 'dashboard' : shift) {
+          case 'dashboard':
+            resolvedComparisonLabel = `vs ${dashboardTitle}`;
+            break;
           case '1 year ago':
             resolvedComparisonLabel = texts.vsSamePeriodLastYear;
             break;

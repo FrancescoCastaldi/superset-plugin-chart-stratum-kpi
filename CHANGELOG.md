@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-11-01
+
+### Added
+- **Periods named after the dashboard filter**: with a dashboard filter such as the Calendar Filter, the comparison label is `vs Comparison period · 1 Jan - 31 Mar 2007` (the name and range the filter sends, in its language) and, without a subtitle of your own, the subtitle shows the reference range (`Period: 1 Jan - 31 Mar 2008`, or `Periodo: ...` with `locale = it`).
+- 5 new tests (210 in total).
+
+### Fixed
+- The open range subtitle `dal ...` was always Italian; it follows `locale` (`from ...` in English).
+
 ## [0.4.1] - 2026-11-01
 
 ### Fixed

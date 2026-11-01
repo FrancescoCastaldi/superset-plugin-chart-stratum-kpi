@@ -8,6 +8,8 @@ export interface KpiTexts {
   months: string[];
   /** Prefix of the subtitle built from the active time range */
   period: string;
+  /** Open range such as `from January 2026` */
+  from: string;
   vsPreviousMonth: string;
   /** Label of the `1 month ago` time shift */
   vsPreviousMonthShift: string;
@@ -36,6 +38,7 @@ export const ITALIAN_MONTH_NAMES = [
 const EN: KpiTexts = {
   months: ENGLISH_MONTHS,
   period: 'Period',
+  from: 'from',
   vsPreviousMonth: 'vs Previous month',
   vsPreviousMonthShift: 'vs Previous month',
   twelveMonths: '12 months',
@@ -53,6 +56,7 @@ const EN: KpiTexts = {
 const IT: KpiTexts = {
   months: ITALIAN_MONTH_NAMES,
   period: 'Periodo',
+  from: 'dal',
   vsPreviousMonth: 'vs Mese precedente',
   vsPreviousMonthShift: 'vs Mese Prec.',
   twelveMonths: '12 mesi',

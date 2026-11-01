@@ -308,6 +308,23 @@ describe('KPI Comparison transformProps', () => {
       expect(props.comparisonLabel).toBe(`vs ${range}`);
     });
 
+    it('names the periods after the calendar names and readable ranges', () => {
+      const range = '2007-01-01 : 2007-04-01';
+      const props = run(
+        { calculation_mode: 'time_shift', metric: 'sum_richieste', time_compare: ['1 year ago'] },
+        [{ sum_richieste: 110, [`sum_richieste__${range}`]: 100 }],
+        {
+          extra_form_data: {
+            time_range: '2008-01-01 : 2008-04-01',
+            time_compare: [range],
+            custom_form_data: [{ period_labels: { reference: 'This year', comparison: 'Last year' }, period_text: { reference: '1 Jan - 31 Mar 2008', comparison: '1 Jan - 31 Mar 2007' } }],
+          },
+        },
+      );
+      expect(props.comparisonLabel).toBe('vs Last year · 1 Jan - 31 Mar 2007');
+      expect(props.kpiSubtitle).toBe('Periodo: 1 Jan - 31 Mar 2008');
+    });
+
     it('uses the second row in time_shift mode when no offset column exists', () => {
       const props = run({ calculation_mode: 'time_shift', metric: 'sum_richieste' }, [
         { sum_richieste: 110 },
