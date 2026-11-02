@@ -26,6 +26,8 @@
     "install:plugin": "powershell -ExecutionPolicy Bypass -File ./install-plugin.ps1"
   },
   "keywords": [
+    "stratum",
+    "stratum-kpi",
     "superset",
     "apache-superset",
     "superset-plugin",
