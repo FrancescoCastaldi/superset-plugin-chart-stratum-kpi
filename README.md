@@ -24,7 +24,7 @@
 
 ### 🔍 Card variants
 
-![StratumKPI target with progress bar](docs/images/kpi_comparison_preview.png)
+![StratumKPI target with progress bar](docs/images/stratum_kpi_preview.png)
 
 *Figure 2: Revenue against a fixed target, with a progress bar that shows how far past the target the value is.*
 
@@ -90,7 +90,7 @@ flowchart LR
 ## 📁 Repository Structure
 
 ```
-superset-plugin-chart-kpi-comparison/
+superset-plugin-chart-stratum-kpi/
 ├── package.json                    # Plugin manifest & dependencies (v0.2.2)
 ├── tsconfig.json                   # TypeScript build configuration
 ├── dev.bat                         # Quick launcher for the local Dev Studio
@@ -146,9 +146,9 @@ For a clean installation that also recompiles the Superset frontend:
 The script:
 1. Validates and installs the missing npm dependencies (`npm install`).
 2. Builds the TypeScript bundle (`tsc --build` / `npm run build`).
-3. Syncs the compiled files into `superset-frontend/plugins/superset-plugin-chart-kpi-comparison`.
+3. Syncs the compiled files into `superset-frontend/plugins/superset-plugin-chart-stratum-kpi`.
 4. Creates a safety backup `MainPreset.ts.bak`.
-5. Registers `KPIComparisonChartPlugin` idempotently under the chart key `kpi_comparison`.
+5. Registers `StratumKPIChartPlugin` idempotently under the chart key `stratum_kpi`.
 6. Clears the Webpack and Babel caches.
 
 ### Option 2: Windows Batch Launcher
@@ -157,12 +157,12 @@ Double-click:
 Press `[1]` to start the automated installer.
 
 ### Option 3: Manual Installation
-1. Copy the plugin folder to `superset-frontend/plugins/superset-plugin-chart-kpi-comparison`.
+1. Copy the plugin folder to `superset-frontend/plugins/superset-plugin-chart-stratum-kpi`.
 2. Edit `superset-frontend/src/visualizations/presets/MainPreset.ts`:
    ```typescript
-   import { KPIComparisonChartPlugin } from '../../../plugins/superset-plugin-chart-kpi-comparison/src';
+   import { StratumKPIChartPlugin } from '../../../plugins/superset-plugin-chart-stratum-kpi/src';
 
-   new KPIComparisonChartPlugin().configure({ key: 'kpi_comparison' }).register(),
+   new StratumKPIChartPlugin().configure({ key: 'stratum_kpi' }).register(),
    ```
 3. Clear the cache:
    ```bash

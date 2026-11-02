@@ -5,10 +5,10 @@
     Installs and registers the KPI Comparison Chart Plugin into an Apache Superset repository:
     1. Locates and validates the Apache Superset root directory.
     2. Builds the plugin (TypeScript compilation) if npm is available.
-    3. Copies plugin files into superset-frontend/plugins/superset-plugin-chart-kpi-comparison.
+    3. Copies plugin files into superset-frontend/plugins/superset-plugin-chart-stratum-kpi.
     4. Safely parses and updates MainPreset.ts with backup and idempotency:
-       - import { KPIComparisonChartPlugin } from '../../../plugins/superset-plugin-chart-kpi-comparison/src';
-       - new KPIComparisonChartPlugin().configure({ key: 'kpi_comparison' }),
+       - import { StratumKPIChartPlugin } from '../../../plugins/superset-plugin-chart-stratum-kpi/src';
+       - new StratumKPIChartPlugin().configure({ key: 'kpi_comparison' }),
        Legacy registration variants (`.register()` lines, odd indentation, duplicates)
        are normalized to the canonical form instead of adding new lines.
     5. Cleans stale Webpack/Babel cache.
@@ -50,7 +50,7 @@ function Write-Color([string]$text, [string]$color = "White") {
 }
 
 Write-Color "================================================================" "Cyan"
-Write-Color "   KPI Comparison Chart - Apache Superset Plugin Installer      " "Cyan"
+Write-Color "   StratumKPI - Apache Superset Plugin Installer      " "Cyan"
 Write-Color "   All-in-One KPI Card with Temporal & Dual Metric Delta %       " "Cyan"
 Write-Color "================================================================" "Cyan"
 Write-Color ""
@@ -206,7 +206,7 @@ if (-not (Test-Path $PluginsTargetRoot)) {
     New-Item -ItemType Directory -Path $PluginsTargetRoot -Force | Out-Null
 }
 
-$DestPluginDir = Join-Path $PluginsTargetRoot "superset-plugin-chart-kpi-comparison"
+$DestPluginDir = Join-Path $PluginsTargetRoot "superset-plugin-chart-stratum-kpi"
 if (Test-Path $DestPluginDir) {
     Write-Color "[INFO] Cleaning the previous version in '$DestPluginDir'..." "Yellow"
     try {
@@ -275,8 +275,8 @@ if (-not (Test-Path $BackupFile)) {
 $RawContent = [System.IO.File]::ReadAllText($PresetFile, [System.Text.Encoding]::UTF8)
 $NL = if ($RawContent.Contains("`r`n")) { "`r`n" } else { "`n" }
 
-$TargetImport = "import { KPIComparisonChartPlugin } from '../../../plugins/superset-plugin-chart-kpi-comparison/src';"
-$TargetRegister = "        new KPIComparisonChartPlugin().configure({ key: 'kpi_comparison' }),"
+$TargetImport = "import { StratumKPIChartPlugin } from '../../../plugins/superset-plugin-chart-stratum-kpi/src';"
+$TargetRegister = "        new StratumKPIChartPlugin().configure({ key: 'stratum_kpi' }),`r`n        new StratumKPIChartPlugin().configure({ key: 'kpi_comparison' }),"
 
 # Idempotency is checked on the CANONICAL form (exact line): legacy variants
 # (riga con `.register()`, indentazioni anomale, duplicati) non contano come
@@ -284,8 +284,8 @@ $TargetRegister = "        new KPIComparisonChartPlugin().configure({ key: 'kpi_
 $PresetLineList = [System.Collections.Generic.List[string]]($RawContent -split "\r?\n")
 $hasExactImport = ($PresetLineList -contains $TargetImport)
 $hasExactRegister = ($PresetLineList -contains $TargetRegister)
-$importCount = ([regex]::Matches($RawContent, "from\s*['`"][^'`"]*superset-plugin-chart-kpi-comparison")).Count
-$registerCount = ([regex]::Matches($RawContent, "new\s+KPIComparisonChartPlugin")).Count
+$importCount = ([regex]::Matches($RawContent, "from\s*['`"][^'`"]*superset-plugin-chart-stratum-kpi")).Count
+$registerCount = ([regex]::Matches($RawContent, "new\s+StratumKPIChartPlugin")).Count
 
 if (-not $CleanReinstall -and $hasExactImport -and $hasExactRegister -and ($importCount -eq 1) -and ($registerCount -eq 1)) {
     Write-Color "[INFO] MainPreset.ts is already registered correctly (idempotent, no change needed)." "Green"
@@ -298,7 +298,7 @@ if (-not $CleanReinstall -and $hasExactImport -and $hasExactRegister -and ($impo
 
     for ($i = 0; $i -lt $lines.Count; $i++) {
         $line = $lines[$i]
-        if ($line -match "from\s*['`"][^'`"]*superset-plugin-chart-kpi-comparison") {
+        if ($line -match "from\s*['`"][^'`"]*superset-plugin-chart-stratum-kpi") {
             continue
         }
         if ($line.Trim().StartsWith("import ")) {
@@ -321,7 +321,7 @@ if (-not $CleanReinstall -and $hasExactImport -and $hasExactRegister -and ($impo
 
     for ($i = 0; $i -lt $regLines.Count; $i++) {
         $line = $regLines[$i]
-        if ($line -match 'new\s+KPIComparisonChartPlugin') {
+        if ($line -match 'new\s+StratumKPIChartPlugin') {
             continue
         }
         $finalLines.Add($line)
