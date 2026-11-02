@@ -284,7 +284,7 @@ $TargetRegister = "        new StratumKPIChartPlugin().configure({ key: 'stratum
 $PresetLineList = [System.Collections.Generic.List[string]]($RawContent -split "\r?\n")
 $hasExactImport = ($PresetLineList -contains $TargetImport)
 $hasExactRegister = ($PresetLineList -contains $TargetRegister)
-$importCount = ([regex]::Matches($RawContent, "from\s*['`"][^'`"]*superset-plugin-chart-stratum-kpi")).Count
+$importCount = ([regex]::Matches($RawContent, "StratumKPIChartPlugin|KPIComparisonChartPlugin")).Count
 $registerCount = ([regex]::Matches($RawContent, "new\s+StratumKPIChartPlugin")).Count
 
 if (-not $CleanReinstall -and $hasExactImport -and $hasExactRegister -and ($importCount -eq 1) -and ($registerCount -eq 1)) {
@@ -298,7 +298,7 @@ if (-not $CleanReinstall -and $hasExactImport -and $hasExactRegister -and ($impo
 
     for ($i = 0; $i -lt $lines.Count; $i++) {
         $line = $lines[$i]
-        if ($line -match "from\s*['`"][^'`"]*superset-plugin-chart-stratum-kpi") {
+        if ($line -match "from\s*['`"][^'`"]*superset-plugin-chart-(stratum-)?kpi" -or $line -match "from\s*['`"][^'`"]*superset-plugin-chart-kpi-comparison" -or $line -match "StratumKPIChartPlugin|KPIComparisonChartPlugin") {
             continue
         }
         if ($line.Trim().StartsWith("import ")) {
