@@ -10,6 +10,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Time filters'),
       expanded: true,
+      tabOverride: 'data',
       controlSetRows: [
         [
           {
@@ -28,6 +29,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Metrics & comparison'),
       expanded: true,
+      tabOverride: 'data',
       controlSetRows: [
         [
           {
@@ -161,6 +163,7 @@ const config: ControlPanelConfig = {
               label: t('Time column (optional, for the sparkline)'),
               description: t('Time column used to sort and plot the sparkline.'),
               multi: false,
+              visibility: ({ controls }) => Boolean(controls?.show_sparkline?.value),
             },
           },
         ],
@@ -241,25 +244,13 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        [
-          {
-            name: 'total_badge_color',
-            config: {
-              type: 'ColorPickerControl',
-              label: t('Total badge background color'),
-              default: { r: 99, g: 102, b: 241, a: 1 }, // Indigo 500
-              description: t('Color for the percentage-of-total badge.'),
-              renderTrigger: true,
-              visibility: ({ controls }) => controls?.badge_content?.value === 'percent_of_total',
-            },
-          },
-        ],
         ['adhoc_filters'],
       ],
     },
     {
       label: t('Card appearance & display'),
       expanded: false,
+      tabOverride: 'customize',
       controlSetRows: [
         [
           {
@@ -386,6 +377,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Card aesthetics'),
       expanded: false,
+      tabOverride: 'customize',
       controlSetRows: [
         [
           {
@@ -431,6 +423,7 @@ const config: ControlPanelConfig = {
               description: t('Corner radius of the card.'),
               clearable: false,
               renderTrigger: true,
+              visibility: ({ controls }) => !controls?.clean_card_mode?.value,
             },
           },
         ],
@@ -450,6 +443,7 @@ const config: ControlPanelConfig = {
               description: t('Elevation and shadow style of the card.'),
               clearable: false,
               renderTrigger: true,
+              visibility: ({ controls }) => !controls?.clean_card_mode?.value,
             },
           },
         ],
@@ -461,6 +455,9 @@ const config: ControlPanelConfig = {
               label: t('Custom border color (e.g. #e2e8f0)'),
               default: '',
               renderTrigger: true,
+              visibility: ({ controls }) =>
+                !controls?.clean_card_mode?.value &&
+                controls?.card_box_shadow?.value === 'bordered',
             },
           },
           {
@@ -476,6 +473,9 @@ const config: ControlPanelConfig = {
               ],
               clearable: false,
               renderTrigger: true,
+              visibility: ({ controls }) =>
+                !controls?.clean_card_mode?.value &&
+                controls?.card_box_shadow?.value === 'bordered',
             },
           },
         ],
@@ -484,6 +484,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Typography & text styling'),
       expanded: false,
+      tabOverride: 'customize',
       controlSetRows: [
         [
           {
@@ -601,6 +602,9 @@ const config: ControlPanelConfig = {
               ],
               clearable: false,
               renderTrigger: true,
+              visibility: ({ controls }) =>
+                controls?.show_title?.value !== false &&
+                !controls?.title_in_chart_header?.value,
             },
           },
           {
@@ -617,6 +621,9 @@ const config: ControlPanelConfig = {
               ],
               clearable: false,
               renderTrigger: true,
+              visibility: ({ controls }) =>
+                controls?.show_title?.value !== false &&
+                !controls?.title_in_chart_header?.value,
             },
           },
         ],
@@ -634,6 +641,9 @@ const config: ControlPanelConfig = {
               ],
               clearable: false,
               renderTrigger: true,
+              visibility: ({ controls }) =>
+                controls?.show_title?.value !== false &&
+                !controls?.title_in_chart_header?.value,
             },
           },
           {
@@ -649,6 +659,7 @@ const config: ControlPanelConfig = {
               ],
               clearable: false,
               renderTrigger: true,
+              visibility: ({ controls }) => Boolean(controls?.enable_comparison?.value),
             },
           },
         ],
@@ -657,6 +668,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Delta % & semantic polarity'),
       expanded: false,
+      tabOverride: 'customize',
       controlSetRows: [
         [
           {
@@ -705,7 +717,9 @@ const config: ControlPanelConfig = {
               clearable: false,
               renderTrigger: true,
               visibility: ({ controls }) =>
-                Boolean(controls?.enable_comparison?.value) &&
+                (Boolean(controls?.enable_comparison?.value) ||
+                  controls?.badge_content?.value === 'percent_of_total') &&
+                controls?.badge_content?.value !== 'none' &&
                 controls?.show_badge?.value !== false,
             },
           },
@@ -727,6 +741,22 @@ const config: ControlPanelConfig = {
               visibility: ({ controls }) =>
                 (Boolean(controls?.enable_comparison?.value) ||
                   controls?.badge_content?.value === 'percent_of_total') &&
+                controls?.badge_content?.value !== 'none' &&
+                controls?.show_badge?.value !== false,
+            },
+          },
+        ],
+        [
+          {
+            name: 'total_badge_color',
+            config: {
+              type: 'ColorPickerControl',
+              label: t('Total badge background color'),
+              default: { r: 99, g: 102, b: 241, a: 1 }, // Indigo 500
+              description: t('Color for the percentage-of-total badge.'),
+              renderTrigger: true,
+              visibility: ({ controls }) =>
+                controls?.badge_content?.value === 'percent_of_total' &&
                 controls?.show_badge?.value !== false,
             },
           },
@@ -766,6 +796,8 @@ const config: ControlPanelConfig = {
               renderTrigger: true,
               visibility: ({ controls }) =>
                 Boolean(controls?.enable_comparison?.value) &&
+                controls?.badge_content?.value !== 'percent_of_total' &&
+                controls?.badge_content?.value !== 'none' &&
                 controls?.show_badge?.value !== false,
             },
           },
@@ -809,6 +841,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Interactivity & drill-through'),
       expanded: false,
+      tabOverride: 'customize',
       controlSetRows: [
         [
           {
@@ -835,6 +868,8 @@ const config: ControlPanelConfig = {
               ],
               clearable: false,
               renderTrigger: true,
+              visibility: ({ controls }) =>
+                Boolean(controls?.click_url?.value && String(controls.click_url.value).trim()),
             },
           },
         ],
@@ -843,6 +878,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Trendline / Sparkline'),
       expanded: false,
+      tabOverride: 'customize',
       controlSetRows: [
         [
           {
@@ -864,6 +900,7 @@ const config: ControlPanelConfig = {
               label: t('Sparkline color'),
               default: { r: 37, g: 99, b: 235, a: 1 },
               renderTrigger: true,
+              visibility: ({ controls }) => Boolean(controls?.show_sparkline?.value),
             },
           },
           {
@@ -873,6 +910,7 @@ const config: ControlPanelConfig = {
               label: t('Fill gradient'),
               default: true,
               renderTrigger: true,
+              visibility: ({ controls }) => Boolean(controls?.show_sparkline?.value),
             },
           },
         ],
@@ -889,6 +927,7 @@ const config: ControlPanelConfig = {
               ],
               clearable: false,
               renderTrigger: true,
+              visibility: ({ controls }) => Boolean(controls?.show_sparkline?.value),
             },
           },
           {
@@ -898,6 +937,7 @@ const config: ControlPanelConfig = {
               label: t('Highlight peak and current value'),
               default: false,
               renderTrigger: true,
+              visibility: ({ controls }) => Boolean(controls?.show_sparkline?.value),
             },
           },
         ],

@@ -17,6 +17,7 @@ export interface KPIComparisonFormData extends QueryFormData {
   time_range?: string;
   comparison_label?: string;
   time_column?: string;
+  locale?: 'en' | 'it' | string;
 
   // Header & Display
   show_title?: boolean;
@@ -80,7 +81,7 @@ export interface KPIComparisonFormData extends QueryFormData {
   show_progress_bar?: boolean;
 
   // Percent of Total
-  badge_content?: 'delta' | 'percent_of_total';
+  badge_content?: 'delta' | 'percent_of_total' | 'none';
   total_metric?: any;
   total_badge_color?: any;
 
