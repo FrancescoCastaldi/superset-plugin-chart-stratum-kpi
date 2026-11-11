@@ -18,6 +18,7 @@ export default function buildQuery(formData: KPIComparisonFormData): QueryContex
   const time_column = getFd('time_column', 'timeColumn');
   const dynamic_subtitle_column = getFd('dynamic_subtitle_column', 'dynamicSubtitleColumn');
   const show_sparkline = getFd('show_sparkline', 'showSparkline');
+  const show_progress_bar = Boolean(getFd('show_progress_bar', 'showProgressBar', false));
   const target_metric = getFd('target_metric', 'targetMetric');
   const badge_content = getFd('badge_content', 'badgeContent');
   const total_metric = getFd('total_metric', 'totalMetric');
@@ -60,7 +61,11 @@ export default function buildQuery(formData: KPIComparisonFormData): QueryContex
       metrics = metric ? [metric] : [];
     }
 
-    if (isComparisonActive && target_metric && !metrics.some(m => getMetricLabel(m) === getMetricLabel(target_metric))) {
+    if (
+      (isComparisonActive || show_progress_bar) &&
+      target_metric &&
+      !metrics.some(m => getMetricLabel(m) === getMetricLabel(target_metric))
+    ) {
       metrics.push(target_metric);
     }
     if (badge_content === 'percent_of_total' && total_metric && !metrics.some(m => getMetricLabel(m) === getMetricLabel(total_metric))) {
@@ -83,6 +88,15 @@ export default function buildQuery(formData: KPIComparisonFormData): QueryContex
       return null;
     };
 
+    const colKey = (col: any): string => {
+      if (!col) return '';
+      if (typeof col === 'string') return col.trim();
+      if (typeof col === 'object') {
+        return String(col.label || col.column_name || col.sqlExpression || '').trim();
+      }
+      return '';
+    };
+
     const validTimeCol = sanitizeColumn(rawTimeCol);
     const isSparklineActive = Boolean(show_sparkline && validTimeCol);
 
@@ -91,15 +105,19 @@ export default function buildQuery(formData: KPIComparisonFormData): QueryContex
       : Array.isArray(fdGroupby)
       ? fdGroupby
       : [];
-    
+
     const extraCols = [...baseExtraCols];
-    if (dynamic_subtitle_column && typeof dynamic_subtitle_column === 'string' && !extraCols.includes(dynamic_subtitle_column)) {
-      extraCols.push(dynamic_subtitle_column);
+    const cleanDynamicCol = sanitizeColumn(dynamic_subtitle_column);
+    if (
+      cleanDynamicCol &&
+      !extraCols.some((c: any) => colKey(sanitizeColumn(c) ?? c) === colKey(cleanDynamicCol))
+    ) {
+      extraCols.push(cleanDynamicCol);
     }
 
     // Safely add validTimeCol to rawColumns if not present
     const rawColumns = isSparklineActive && validTimeCol
-      ? [validTimeCol, ...extraCols.filter((c: any) => c !== validTimeCol && sanitizeColumn(c) !== sanitizeColumn(validTimeCol))]
+      ? [validTimeCol, ...extraCols.filter((c: any) => colKey(sanitizeColumn(c) ?? c) !== colKey(validTimeCol))]
       : extraCols;
 
     const finalColumns = (rawColumns || [])
@@ -136,7 +154,13 @@ export default function buildQuery(formData: KPIComparisonFormData): QueryContex
       .map(sanitizeColumn)
       .filter((c: any) => c !== null);
 
-    const mergedColumns = Array.from(new Set([...cleanBaseColumns, ...finalColumns]));
+    const seenColKeys = new Set<string>();
+    const mergedColumns = [...cleanBaseColumns, ...finalColumns].filter((c: any) => {
+      const k = colKey(c);
+      if (!k || seenColKeys.has(k)) return false;
+      seenColKeys.add(k);
+      return true;
+    });
 
     const query: any = {
       ...baseQueryObject,
@@ -146,7 +170,7 @@ export default function buildQuery(formData: KPIComparisonFormData): QueryContex
     };
 
     if (isSparklineActive && validTimeCol) {
-      query.orderby = [[validTimeCol, true]];
+      query.orderby = [[validTimeCol, false]];
     }
 
     // In time shift mode, or when a dashboard PeriodCompare filter is active, apply Superset's native time offset query

@@ -12,6 +12,7 @@ interface KPIComparisonBadgeProps {
   isCompact?: boolean;
   isUltraCompact?: boolean;
   hideAbsoluteDelta?: boolean;
+  tooltipPrefix?: string;
 }
 
 export const KPIComparisonBadge: React.FC<KPIComparisonBadgeProps> = ({
@@ -25,6 +26,7 @@ export const KPIComparisonBadge: React.FC<KPIComparisonBadgeProps> = ({
   isCompact = false,
   isUltraCompact = false,
   hideAbsoluteDelta = false,
+  tooltipPrefix = 'Change',
 }) => {
   const getArrowIcon = () => {
     switch (trendDirection) {
@@ -84,8 +86,8 @@ export const KPIComparisonBadge: React.FC<KPIComparisonBadgeProps> = ({
   const shouldRenderAbsoluteDelta = showAbsoluteDelta && !hideAbsoluteDelta && hasAbsoluteDelta;
 
   const tooltipText = hasAbsoluteDelta
-    ? `Change: ${deltaPercentStr} (${deltaAbsoluteStr})`
-    : `Change: ${deltaPercentStr}`;
+    ? `${tooltipPrefix}: ${deltaPercentStr} (${deltaAbsoluteStr})`
+    : `${tooltipPrefix}: ${deltaPercentStr}`;
 
   const arrowIcon = getArrowIcon();
 

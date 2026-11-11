@@ -11,6 +11,7 @@ interface KPIComparisonBadgeProps {
     isCompact?: boolean;
     isUltraCompact?: boolean;
     hideAbsoluteDelta?: boolean;
+    tooltipPrefix?: string;
 }
 export declare const KPIComparisonBadge: React.FC<KPIComparisonBadgeProps>;
 export {};

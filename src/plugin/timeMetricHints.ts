@@ -62,7 +62,7 @@ function isTimeLikeMetric(metric: unknown, dataset: any): boolean {
 }
 
 /** True when any metric picked in the Data section looks like a Time field */
-export function hasTimeMetric(props: { controls?: any }): boolean {
+export function hasTimeMetric(props: { controls?: any; datasource?: any }): boolean {
   const controls = props?.controls;
   if (!controls) return false;
   const dataset = datasetOf(props);
@@ -72,3 +72,15 @@ export function hasTimeMetric(props: { controls?: any }): boolean {
     return list.some(metric => isTimeLikeMetric(metric, dataset));
   });
 }
+
+/**
+ * Shows a duration control when the selected metric looks like a Time field OR when
+ * the user has already customized this control away from its default value.
+ */
+export const showDurationControl =
+  (name: string, defaultValue: unknown) =>
+  (props: { controls?: any; datasource?: any }): boolean => {
+    const value = props?.controls?.[name]?.value;
+    if (value !== undefined && value !== defaultValue) return true;
+    return hasTimeMetric(props);
+  };

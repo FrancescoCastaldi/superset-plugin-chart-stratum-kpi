@@ -1,7 +1,7 @@
 import transformProps from '../src/plugin/transformProps';
 import { isNumericCell, parseNumericValue, parseStaticNumber } from '../src/utils/formatters';
 import { formatDuration, formatSignedDuration, parseTimeToSeconds } from '../src/utils/timeValues';
-import { hasTimeMetric } from '../src/plugin/timeMetricHints';
+import { hasTimeMetric, showDurationControl } from '../src/plugin/timeMetricHints';
 
 type Row = Record<string, any>;
 
@@ -104,7 +104,7 @@ describe('KPI card with a Time metric', () => {
     const props = run({ calculation_mode: 'dual_metric', metric: 'richieste', comparison_metric: 'richieste_conf' }, [
       { richieste: 1200, richieste_conf: 1000 },
     ]);
-    expect(props.formattedPrimary).toBe('1.200');
+    expect(props.formattedPrimary).toBe('1,2k');
     expect(props.formattedDeltaAbsolute).toBe('+200');
   });
 
@@ -148,5 +148,12 @@ describe('hasTimeMetric with the dataset as Explore passes it', () => {
   it('stays hidden for a count when the dataset is on the props', () => {
     const props = { datasource: dataset, controls: { metric: { value: 'Numero' } } };
     expect(hasTimeMetric(props as any)).toBe(false);
+  });
+
+  it('keeps customized duration controls visible even without a Time metric', () => {
+    const fmtVis = showDurationControl('time_display_format', 'auto');
+    expect(fmtVis({ datasource: dataset, controls: { metric: { value: 'Numero' }, time_display_format: { value: 'auto' } } })).toBe(false);
+    expect(fmtVis({ datasource: dataset, controls: { metric: { value: 'Numero' }, time_display_format: { value: 'minutes' } } })).toBe(true);
+    expect(fmtVis({ datasource: dataset, controls: { metric: { value: 'Attesa Sportello' }, time_display_format: { value: 'auto' } } })).toBe(true);
   });
 });

@@ -20,6 +20,8 @@ export const KPISparkline: React.FC<KPISparklineProps> = ({
   curve = 'smooth',
   showPoints = false,
 }) => {
+  const uid = React.useId();
+
   if (!data || data.length < 2) {
     return null;
   }
@@ -33,8 +35,7 @@ export const KPISparkline: React.FC<KPISparklineProps> = ({
   const max = Math.max(...data);
   const peakPoint = points.find((p) => p.val === max);
 
-  // Clean deterministic gradient ID
-  const gradientId = 'kpi-sparkline-gradient';
+  const gradientId = `kpi-sparkline-gradient-${uid.replace(/[^a-zA-Z0-9_-]/g, '')}`;
 
   return (
     <div style={{ width: width, height, marginTop: '4px', overflow: 'hidden' }}>

@@ -4,6 +4,7 @@ import {
   formatItalianNumber,
   formatDeltaPercent,
   parseNumericValue,
+  parseStaticNumber,
   getMetricLabel,
   formatMonthYearItalian,
   ITALIAN_MONTHS,
@@ -167,5 +168,18 @@ describe('KPI Comparison formatters', () => {
     expect(ITALIAN_MONTHS).toHaveLength(12);
     expect(ITALIAN_MONTHS[0]).toBe('Gennaio');
     expect(ITALIAN_MONTHS[11]).toBe('Dicembre');
+  });
+
+  describe('parseStaticNumber', () => {
+    it('parses Italian thousands, decimals, currency prefixes and durations', () => {
+      expect(parseStaticNumber('150.000')).toBe(150000);
+      expect(parseStaticNumber('150,5')).toBe(150.5);
+      expect(parseStaticNumber('€ 150.000')).toBe(150000);
+      expect(parseStaticNumber('1.500.000,75')).toBe(1500000.75);
+      expect(parseStaticNumber('1,250.5')).toBe(1250.5);
+      expect(parseStaticNumber('0.500')).toBe(0.5);
+      expect(parseStaticNumber('00:10:00')).toBe(600);
+      expect(parseStaticNumber('')).toBeNaN();
+    });
   });
 });

@@ -1,1 +1,1 @@
-{"version":3,"file":"buildQuery.d.ts","sourceRoot":"","sources":["../../src/plugin/buildQuery.ts"],"names":[],"mappings":"AAAA,OAAO,EAAqB,YAAY,EAAiB,MAAM,mBAAmB,CAAC;AACnF,OAAO,EAAE,qBAAqB,EAAE,MAAM,UAAU,CAAC;AAGjD,MAAM,CAAC,OAAO,UAAU,UAAU,CAAC,QAAQ,EAAE,qBAAqB,GAAG,YAAY,CAyKhF"}
+{"version":3,"file":"buildQuery.d.ts","sourceRoot":"","sources":["../../src/plugin/buildQuery.ts"],"names":[],"mappings":"AAAA,OAAO,EAAqB,YAAY,EAAiB,MAAM,mBAAmB,CAAC;AACnF,OAAO,EAAE,qBAAqB,EAAE,MAAM,UAAU,CAAC;AAGjD,MAAM,CAAC,OAAO,UAAU,UAAU,CAAC,QAAQ,EAAE,qBAAqB,GAAG,YAAY,CAiMhF"}

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-11
+
+### Fixed
+- **Package exports and TypeScript build**: fixed `src/index.ts` to re-export `default as KPIComparisonChartPlugin`, resolving `tsc --noEmit` failure and legacy `MainPreset.ts` compatibility.
+- **Zero-baseline `Nuovo` badge**: `transformProps` now sets `hasComparison: true` whenever `isZeroBaseline` applies, removed the dead hardcoded `'0,0%'` branch, and localized title prefixes (`Peak`, `Min`, `Requests`), badge tooltips, and default target suffix.
+- **Static target parsing and target query inclusion**: `parseStaticNumber` handles Italian thousands/decimal separators and currency prefixes (`150.000`, `150,5`, `€ 150.000`); `buildQuery` includes `target_metric` whenever `show_progress_bar` is enabled even if comparison is disabled.
+- **Safer comparison key lookup**: `time_shift` and keyword heuristics prioritize `${metric}__${time_compare}` then `${metric}__*`, require the primary metric prefix, and ignore target/total columns.
+- **Sparkline SVG IDs and card layout**: `KPISparkline` uses per-instance `React.useId()` so multiple cards never share a `<linearGradient>` ID; `top_right` badge renders even without an inline card title; non-comparison subtitle no longer renders twice.
+- **Safe drill-through links and column objects**: `click_url` accepts only `http(s)` and relative paths (opening with `'noopener'`), and `dynamic_subtitle_column` works when configured as a column object.
+
+### Changed
+- **Behavior change in target precedence**: `static_target` mode now shares the same priority order as the progress bar (`target_metric` first, `target_static_value` as fallback, matching panel help text).
+- **Behavior change in sparkline ordering and reference row**: sparkline queries sort descending by `time_column` to capture the latest rows and reverse client-side to chronological order; `selectReferenceRow` selects the latest row across all calculation modes rather than only `dual_metric`.
+- **Behavior change in `SMART_NUMBER` locale and default alignment**: `SMART_NUMBER` adapts decimal punctuation to `locale` (`it` uses comma), and runtime defaults for `number_format` (`'SMART_NUMBER'`), `card_bg_color` (transparent), and `kpi_font_size_manual` (`36`) match the control panel.
+- **Italian StratumBar-aligned control panel**: reorganized into 6 Italian sections (`Dati` expanded by default, `Confronto tra periodi`, `Formato dei valori`, `Aspetto`, `Sparkline`, `Interazione`), removed the duplicate `'none'` choice in `badge_content` (single hide toggle via `show_badge`), moved `locale` to `Aspetto` and `time_column` next to `show_sparkline`, ordered `show_progress_bar` before target controls, fixed misleading "top right" wording, added `showDurationControl`, removed emojis, and added panel/wiring tests.
+
 ## [0.6.1] - 2026-11-11
 
 ### Fixed

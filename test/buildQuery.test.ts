@@ -142,6 +142,17 @@ describe('KPI Comparison buildQuery', () => {
       expect(queries[0].time_offsets).toBeUndefined();
     });
 
+    it('adds the target metric when the progress bar is active even if comparison is disabled', () => {
+      const { queries } = build({
+        enable_comparison: false,
+        calculation_mode: 'none',
+        metric: 'sum_x',
+        show_progress_bar: true,
+        target_metric: 'sum_target',
+      });
+      expect(queries[0].metrics).toEqual(['sum_x', 'sum_target']);
+    });
+
     it('requests the primary metric only when calculation_mode is none', () => {
       const { queries } = build({
         calculation_mode: 'none',
@@ -174,25 +185,25 @@ describe('KPI Comparison buildQuery', () => {
   });
 
   describe('sparkline', () => {
-    it('orders by the time column, includes it in columns and raises the row limit', () => {
+    it('orders descending by the time column to fetch the latest rows, includes it and raises row_limit', () => {
       const { queries } = build({
         metric: 'sum_x',
         show_sparkline: true,
         time_column: 'data',
       });
       expect(queries[0].columns).toContain('data');
-      expect(queries[0].orderby).toEqual([['data', true]]);
+      expect(queries[0].orderby).toEqual([['data', false]]);
       expect(queries[0].row_limit).toBe(50);
     });
 
-    it('normalizes time column objects to their column_name', () => {
+    it('normalizes time column objects to their column_name with descending order', () => {
       const { queries } = build({
         metric: 'sum_x',
         show_sparkline: true,
         time_column: { column_name: 'data' } as any,
       });
       expect(queries[0].columns).toContain('data');
-      expect(queries[0].orderby).toEqual([['data', true]]);
+      expect(queries[0].orderby).toEqual([['data', false]]);
     });
 
     it('does not add ordering when the sparkline is disabled', () => {
@@ -202,12 +213,18 @@ describe('KPI Comparison buildQuery', () => {
     });
   });
 
-  it('adds the dynamic subtitle column to the query columns', () => {
+  it('adds the dynamic subtitle column to the query columns for strings and column objects', () => {
     const { queries } = build({
       metric: 'sum_x',
       dynamic_subtitle_column: 'sottotitolo',
     });
     expect(queries[0].columns).toContain('sottotitolo');
+
+    const objQuery = build({
+      metric: 'sum_x',
+      dynamic_subtitle_column: { column_name: 'reparto' } as any,
+    });
+    expect(objQuery.queries[0].columns).toContain('reparto');
   });
 
   describe('dashboard period comparison (PeriodCompare filter)', () => {

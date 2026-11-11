@@ -64,7 +64,14 @@ export function formatMetricValue(
   if (formatString) {
     try {
       const formatter = getNumberFormatter(formatString);
-      return formatter(value);
+      const formatted = formatter(value);
+      if (
+        locale === 'it' &&
+        (formatString === 'SMART_NUMBER' || formatString === 'SMART_NUMBER_SIGNED')
+      ) {
+        return formatted.replace(/\./g, ',');
+      }
+      return formatted;
     } catch {
       // Fallback if formatter string is not standard
     }
@@ -101,10 +108,47 @@ export function isNumericCell(val: unknown): boolean {
   return typeof val === 'number' || (typeof val === 'string' && parseTimeToSeconds(val) !== null);
 }
 
-/** The target typed in a control: a time (`00:10:00`, in seconds) or a plain number */
+/** The target typed in a control: a time (`00:10:00`, in seconds), localized number (`150.000`, `150,5`, `€ 150.000`) or plain number. */
 export function parseStaticNumber(text: string): number {
-  const seconds = parseTimeToSeconds(text);
-  return seconds !== null ? seconds : parseFloat(text);
+  if (typeof text !== 'string') return NaN;
+  const trimmed = text.trim();
+  if (!trimmed) return NaN;
+
+  const seconds = parseTimeToSeconds(trimmed);
+  if (seconds !== null) return seconds;
+
+  const withoutCurrency = trimmed
+    .replace(/[€$£¥\u00A0\s]+/g, '')
+    .replace(/(?:EUR|USD|CHF)$/i, '')
+    .replace(/^(?:EUR|USD|CHF)/i, '');
+
+  if (!/^[+-]?\d[\d.,]*$/.test(withoutCurrency)) {
+    return NaN;
+  }
+
+  const hasDot = withoutCurrency.includes('.');
+  const hasComma = withoutCurrency.includes(',');
+  let canonical = withoutCurrency;
+
+  if (hasDot && hasComma) {
+    canonical =
+      withoutCurrency.lastIndexOf(',') > withoutCurrency.lastIndexOf('.')
+        ? withoutCurrency.replace(/\./g, '').replace(',', '.')
+        : withoutCurrency.replace(/,/g, '');
+  } else if (hasComma) {
+    if (/^[+-]?[1-9]\d{0,2}(,\d{3}){2,}$/.test(withoutCurrency)) {
+      canonical = withoutCurrency.replace(/,/g, '');
+    } else {
+      canonical = withoutCurrency.replace(',', '.');
+    }
+  } else if (hasDot) {
+    if (/^[+-]?[1-9]\d{0,2}(\.\d{3})+$/.test(withoutCurrency)) {
+      canonical = withoutCurrency.replace(/\./g, '');
+    }
+  }
+
+  const parsed = Number(canonical);
+  return Number.isFinite(parsed) ? parsed : NaN;
 }
 
 export const ITALIAN_MONTHS = ITALIAN_MONTH_NAMES;

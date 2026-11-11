@@ -61,15 +61,18 @@ describe('KPI Comparison series utils', () => {
       expect(selectReferenceRow(data, 'v', { ...defaults, isPeak: true })).toBe(data[0]);
     });
 
-    it('uses the last row of a dual-metric sparkline series', () => {
+    it('uses the last row of a sparkline series regardless of calculation mode', () => {
       expect(selectReferenceRow(rows, 'v', { ...defaults, showSparkline: true })).toBe(rows[2]);
-    });
-
-    it('uses the first row otherwise', () => {
-      expect(selectReferenceRow(rows, 'v', defaults)).toBe(rows[0]);
       expect(
         selectReferenceRow(rows, 'v', { ...defaults, calculationMode: 'time_shift', showSparkline: true }),
-      ).toBe(rows[0]);
+      ).toBe(rows[2]);
+      expect(
+        selectReferenceRow(rows, 'v', { ...defaults, calculationMode: 'static_target', showSparkline: true }),
+      ).toBe(rows[2]);
+    });
+
+    it('uses the first row when sparkline is off or there is only one row', () => {
+      expect(selectReferenceRow(rows, 'v', defaults)).toBe(rows[0]);
       const single = [rows[0]];
       expect(selectReferenceRow(single, 'v', { ...defaults, showSparkline: true })).toBe(single[0]);
     });

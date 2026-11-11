@@ -12,12 +12,18 @@ describe('KPI Comparison formatMetricValue', () => {
     expect(formatMetricValue(1234.567)).toBe('1.234,57');
   });
 
-  it('uses the Superset adaptive SMART_NUMBER formatter', () => {
-    expect(formatMetricValue(1234, 'SMART_NUMBER')).toBe('1.23k');
-    expect(formatMetricValue(2500000000, 'SMART_NUMBER')).toBe('2.5B');
-    expect(formatMetricValue(12.345, 'SMART_NUMBER')).toBe('12.35');
-    expect(formatMetricValue(0.01234, 'SMART_NUMBER')).toBe('0.0123');
+  it('uses the Superset adaptive SMART_NUMBER formatter respecting locale', () => {
+    expect(formatMetricValue(1234, 'SMART_NUMBER')).toBe('1,23k');
+    expect(formatMetricValue(2500000000, 'SMART_NUMBER')).toBe('2,5B');
+    expect(formatMetricValue(12.345, 'SMART_NUMBER')).toBe('12,35');
+    expect(formatMetricValue(0.01234, 'SMART_NUMBER')).toBe('0,0123');
     expect(formatMetricValue(0, 'SMART_NUMBER')).toBe('0');
+
+    expect(formatMetricValue(1234, 'SMART_NUMBER', 'en')).toBe('1.23k');
+    expect(formatMetricValue(2500000000, 'SMART_NUMBER', 'en')).toBe('2.5B');
+    expect(formatMetricValue(12.345, 'SMART_NUMBER', 'en')).toBe('12.35');
+    expect(formatMetricValue(0.01234, 'SMART_NUMBER', 'en')).toBe('0.0123');
+    expect(formatMetricValue(0, 'SMART_NUMBER', 'en')).toBe('0');
   });
 
   it('uses d3 format strings with the default Superset locale', () => {

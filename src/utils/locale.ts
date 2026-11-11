@@ -27,6 +27,10 @@ export interface KpiTexts {
   vsComparisonPeriod: string;
   vsTarget: string;
   requiresTimeFilter: string;
+  peakPrefix: string;
+  minPrefix: string;
+  requestsPrefix: string;
+  changePrefix: string;
 }
 
 export const ENGLISH_MONTHS = [
@@ -57,6 +61,10 @@ const EN: KpiTexts = {
   vsComparisonPeriod: 'vs Comparison period',
   vsTarget: 'vs Target',
   requiresTimeFilter: '⚠️ Requires a time filter',
+  peakPrefix: 'Peak',
+  minPrefix: 'Min',
+  requestsPrefix: 'Requests',
+  changePrefix: 'Change',
 };
 
 const IT: KpiTexts = {
@@ -77,6 +85,10 @@ const IT: KpiTexts = {
   vsComparisonPeriod: 'vs Periodo Confronto',
   vsTarget: 'vs Obiettivo',
   requiresTimeFilter: '⚠️ Richiede Filtro Temporale',
+  peakPrefix: 'Picco',
+  minPrefix: 'Minimo',
+  requestsPrefix: 'Richieste',
+  changePrefix: 'Variazione',
 };
 
 export function getKpiTexts(locale: unknown): KpiTexts {

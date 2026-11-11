@@ -179,4 +179,5 @@ export interface KPIComparisonProps {
   applyTrendColorTo?: 'badge' | 'text' | 'background';
   clickUrl?: string;
   clickTarget?: '_blank' | '_self';
+  locale?: 'en' | 'it';
 }

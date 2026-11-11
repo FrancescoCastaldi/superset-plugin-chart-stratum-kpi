@@ -3,6 +3,34 @@ import { KPIComparisonProps } from '../types';
 import { KPIComparisonBadge } from './KPIComparisonBadge';
 import { KPISparkline } from './KPISparkline';
 import { syncChartHeaderTitle } from '../utils/chartHeaderTitle';
+import { getKpiTexts } from '../utils/locale';
+
+/** Accepts only http(s) URLs and safe relative paths; rejects javascript:, data:, vbscript: and protocol-relative // links. */
+export function sanitizeClickUrl(raw?: string): string | null {
+  if (typeof raw !== 'string') return null;
+  const trimmed = raw.trim();
+  if (!trimmed || /[\u0000-\u001F\u007F]/.test(trimmed)) return null;
+  if (trimmed.startsWith('//')) return null;
+  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) {
+    return trimmed;
+  }
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? trimmed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function openSafeClickUrl(
+  clickUrl?: string,
+  clickTarget: '_blank' | '_self' = '_self',
+): boolean {
+  const safeUrl = sanitizeClickUrl(clickUrl);
+  if (!safeUrl || typeof window === 'undefined') return false;
+  window.open(safeUrl, clickTarget, 'noopener');
+  return true;
+}
 
 const GOOGLE_FONTS_MAP: Record<string, string> = {
   Inter: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap',
@@ -77,7 +105,10 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
   applyTrendColorTo = 'badge',
   clickUrl = '',
   clickTarget = '_self',
+  locale = 'en',
 }) => {
+  const texts = getKpiTexts(locale);
+  const safeClickUrl = sanitizeClickUrl(clickUrl);
   const rootRef = React.useRef<HTMLDivElement>(null);
   const headerTitle = showTitle && titleInChartHeader && Boolean(kpiTitle && kpiTitle.trim());
 
@@ -119,14 +150,18 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
   const isTitleMini = isHorizontalUltraCompact;
   const showSubtitle = canRenderTitle && height >= 140 && width >= 200 && Boolean(kpiSubtitle);
 
-  // Bottom row content detection
+  const showTopRightBadge = badgePosition === 'top_right' && showBadge && hasComparison;
+  const showTopRow = canRenderTitle || showTopRightBadge;
+
+  // Bottom row content detection (avoid duplicating kpiSubtitle when already shown below title)
   const hasBottomComparisonContent = Boolean(
     hasComparison &&
       ((showBadge && badgePosition === 'bottom_left') ||
         (showComparisonValue && comparisonValue !== null) ||
         (showComparisonLabel && Boolean(comparisonLabel)))
   );
-  const hasBottomContent = hasBottomComparisonContent || (!hasComparison && Boolean(kpiSubtitle));
+  const showBottomSubtitle = !hasComparison && !showSubtitle && Boolean(kpiSubtitle);
+  const hasBottomContent = hasBottomComparisonContent || showBottomSubtitle;
 
   // Sparkline: requires sufficient vertical room (>= 125px)
   const canRenderSparkline =
@@ -139,7 +174,15 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
   const padH = width < 150 ? 6 : width < 200 ? 10 : width < 280 ? 14 : 20;
 
   // Fluid responsive font size calculation
-  const titleHeight = canRenderTitle ? (showSubtitle ? 32 : isTitleMini ? 14 : 18) : 0;
+  const titleHeight = canRenderTitle
+    ? showSubtitle
+      ? 32
+      : isTitleMini
+      ? 14
+      : 18
+    : showTopRightBadge
+    ? 20
+    : 0;
   const bottomHeight = hasBottomContent
     ? (isVerticalUltraCompact ? 18 : isVerticalCompact ? 22 : 26)
     : 0;
@@ -291,7 +334,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
   return (
     <div
       ref={rootRef}
-      onClick={clickUrl ? () => window.open(clickUrl, clickTarget) : undefined}
+      onClick={safeClickUrl ? () => openSafeClickUrl(safeClickUrl, clickTarget) : undefined}
       style={{
         width,
         height,
@@ -299,8 +342,8 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
         padding: cleanCardMode ? '4px 6px' : `${padV}px ${padH}px`,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: !showTitle || headerTitle ? 'center' : 'space-between',
-        gap: !showTitle || headerTitle ? (height < 70 ? '2px' : '4px') : '0px',
+        justifyContent: !showTopRow ? 'center' : 'space-between',
+        gap: !showTopRow ? (height < 70 ? '2px' : '4px') : '0px',
         backgroundColor: finalCardBg,
         borderRadius: cleanCardMode ? '0px' : borderRadius,
         boxShadow: cleanCardMode ? 'none' : boxShadow,
@@ -308,7 +351,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
         fontFamily: resolvedFontFamily,
         overflow: 'hidden',
         position: 'relative',
-        cursor: clickUrl ? 'pointer' : 'default',
+        cursor: safeClickUrl ? 'pointer' : 'default',
         transition: 'background-color 0.2s ease',
       }}
       title={
@@ -319,27 +362,28 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
           : undefined
       }
     >
-      {/* Top Section: Title & Subtitle */}
-      {canRenderTitle && (
+      {/* Top Section: Title, Subtitle & optional top_right Badge */}
+      {showTopRow && (
         <div
           style={{
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: canRenderTitle ? 'space-between' : 'flex-end',
             alignItems: 'flex-start',
             width: '100%',
             flexShrink: 0,
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              flex: 1,
-              minWidth: 0,
-              ...alignStyles,
-            }}
-          >
+          {canRenderTitle && (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                minWidth: 0,
+                ...alignStyles,
+              }}
+            >
             <div
               style={{
                 fontFamily: resolvedFontFamily,
@@ -393,9 +437,10 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
                 {kpiSubtitle}
               </div>
             )}
-          </div>
-          {badgePosition === 'top_right' && showBadge && hasComparison && (
-            <div style={{ marginLeft: '6px', flexShrink: 0 }}>
+            </div>
+          )}
+          {showTopRightBadge && (
+            <div style={{ marginLeft: canRenderTitle ? '6px' : '0px', flexShrink: 0 }}>
               <KPIComparisonBadge
                 deltaPercentStr={formattedDeltaPercent}
                 deltaAbsoluteStr={formattedDeltaAbsolute}
@@ -407,6 +452,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
                 isCompact={isVerticalCompact}
                 isUltraCompact={isVerticalUltraCompact}
                 hideAbsoluteDelta={hideBadgeAbsolute}
+                tooltipPrefix={texts.changePrefix}
               />
             </div>
           )}
@@ -497,6 +543,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
               isCompact={isVerticalCompact}
               isUltraCompact={isVerticalUltraCompact}
               hideAbsoluteDelta={hideBadgeAbsolute}
+              tooltipPrefix={texts.changePrefix}
             />
           </div>
         )}
@@ -543,6 +590,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
                   isCompact={isVerticalCompact}
                   isUltraCompact={isVerticalUltraCompact}
                   hideAbsoluteDelta={hideBadgeAbsolute}
+                  tooltipPrefix={texts.changePrefix}
                 />
               )}
 
@@ -611,8 +659,8 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
               )}
             </>
           ) : (
-            /* NO COMPARISON: Render dynamic month and year as bottom subtitle */
-            kpiSubtitle && (
+            /* NO COMPARISON: Render dynamic month and year as bottom subtitle when not shown above */
+            showBottomSubtitle && (
               <div
                 style={{
                   color: '#64748b',
@@ -691,7 +739,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
               fontWeight: 500,
             }}
           >
-            {targetProgressPercent > 100 ? '>100%' : `${Math.round(targetProgressPercent)}%`} {targetProgressSuffix ?? 'of target'}
+            {targetProgressPercent > 100 ? '>100%' : `${Math.round(targetProgressPercent)}%`} {targetProgressSuffix ?? texts.ofTarget}
           </div>
         </div>
       )}

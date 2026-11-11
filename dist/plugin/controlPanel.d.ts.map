@@ -1,1 +1,1 @@
-{"version":3,"file":"controlPanel.d.ts","sourceRoot":"","sources":["../../src/plugin/controlPanel.tsx"],"names":[],"mappings":"AAAA,OAAO,EACL,kBAAkB,EAEnB,MAAM,6BAA6B,CAAC;AAIrC,QAAA,MAAM,MAAM,EAAE,kBAg3Bb,CAAC;eAEa,MAAM"}
+{"version":3,"file":"controlPanel.d.ts","sourceRoot":"","sources":["../../src/plugin/controlPanel.tsx"],"names":[],"mappings":"AAAA,OAAO,EACL,kBAAkB,EAEnB,MAAM,6BAA6B,CAAC;AA6BrC,QAAA,MAAM,MAAM,EAAE,kBAk7Bb,CAAC;eAEa,MAAM"}

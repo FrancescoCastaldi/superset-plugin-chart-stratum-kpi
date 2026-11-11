@@ -15,6 +15,7 @@ export interface KPIComparisonFormData extends QueryFormData {
     time_range?: string;
     comparison_label?: string;
     time_column?: string;
+    locale?: 'en' | 'it' | string;
     show_title?: boolean;
     title_in_chart_header?: boolean;
     kpi_title?: string;
@@ -64,7 +65,7 @@ export interface KPIComparisonFormData extends QueryFormData {
     target_metric?: any;
     target_static_value?: string;
     show_progress_bar?: boolean;
-    badge_content?: 'delta' | 'percent_of_total';
+    badge_content?: 'delta' | 'percent_of_total' | 'none';
     total_metric?: any;
     total_badge_color?: any;
     apply_trend_color_to?: 'badge' | 'text' | 'background';
@@ -134,8 +135,11 @@ export interface KPIComparisonProps {
     sparklineShowPoints?: boolean;
     showProgressBar?: boolean;
     targetProgressPercent?: number | null;
+    /** Text after the progress percentage (`of target`) */
+    targetProgressSuffix?: string;
     applyTrendColorTo?: 'badge' | 'text' | 'background';
     clickUrl?: string;
     clickTarget?: '_blank' | '_self';
+    locale?: 'en' | 'it';
 }
 //# sourceMappingURL=types.d.ts.map

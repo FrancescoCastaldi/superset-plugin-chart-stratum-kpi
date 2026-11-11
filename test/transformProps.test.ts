@@ -55,8 +55,8 @@ describe('KPI Comparison transformProps', () => {
         hasComparison: true,
         deltaAbsolute: 200,
         deltaPercent: 20,
-        formattedPrimary: '1.200',
-        formattedComparison: '1.000',
+        formattedPrimary: '1,2k',
+        formattedComparison: '1k',
         formattedDeltaAbsolute: '+200',
         formattedDeltaPercent: '+20,0%',
         trendDirection: 'up',
@@ -111,6 +111,7 @@ describe('KPI Comparison transformProps', () => {
         applyTrendColorTo: 'badge',
         clickUrl: '',
         clickTarget: '_self',
+        locale: 'it',
       });
     });
 
@@ -234,16 +235,27 @@ describe('KPI Comparison transformProps', () => {
       const props = run(dualMetric, [{ sum_richieste: '12,5', sum_richieste_conf: '10' }]);
       expect(props.primaryValue).toBe(12.5);
       expect(props.comparisonValue).toBe(10);
-      expect(props.formattedPrimary).toBe('12,50');
+      expect(props.formattedPrimary).toBe('12,5');
     });
   });
 
   describe('comparison value by calculation mode', () => {
-    it('finds the comparison metric through keyword fallback in dual-metric mode', () => {
+    it('finds the comparison metric through keyword fallback only with metric prefix and without target/total', () => {
       const props = run({ ...dualMetric, comparison_metric: 'cmp_x' }, [
-        { sum_richieste: 10, valore_prev: 8 },
+        {
+          sum_richieste: 10,
+          target_prev: 999,
+          totale_conf: 888,
+          sum_richieste_target_prev: 777,
+          sum_richieste_prev: 8,
+        },
       ]);
       expect(props.comparisonValue).toBe(8);
+
+      const noPrefix = run({ ...dualMetric, comparison_metric: 'cmp_x' }, [
+        { sum_richieste: 10, valore_prev: 8, target_prev: 99, totale_conf: 77 },
+      ]);
+      expect(noPrefix.comparisonValue).toBeNull();
     });
 
     it('labels a non-"conf" comparison metric with its own name', () => {
@@ -268,21 +280,54 @@ describe('KPI Comparison transformProps', () => {
       expect(props.comparisonLabel).toBe('vs Obiettivo');
     });
 
-    it('falls back to the target metric column when the static value is not numeric', () => {
-      const props = run(
-        { calculation_mode: 'static_target', metric: 'sum_richieste', target_metric: 'obiettivo' },
+    it('prefers target_metric over target_static_value in static_target mode and falls back to Italian static targets', () => {
+      const propsMetricWins = run(
+        {
+          calculation_mode: 'static_target',
+          metric: 'sum_richieste',
+          target_metric: 'obiettivo',
+          target_static_value: '2000',
+        },
         [{ sum_richieste: 900, obiettivo: 1000 }],
       );
-      expect(props.comparisonValue).toBe(1000);
+      expect(propsMetricWins.comparisonValue).toBe(1000);
+
+      const propsFallback = run(
+        { calculation_mode: 'static_target', metric: 'sum_richieste', target_metric: 'obiettivo', target_static_value: '€ 150.000' },
+        [{ sum_richieste: 900 }],
+      );
+      expect(propsFallback.comparisonValue).toBe(150000);
     });
 
-    it('reads the offset column in time_shift mode', () => {
-      const props = run({ calculation_mode: 'time_shift', metric: 'sum_richieste' }, [
-        { sum_richieste: 110, 'sum_richieste__1 year ago': 100 },
-      ]);
-      expect(props.comparisonValue).toBe(100);
-      expect(props.deltaPercent).toBeCloseTo(10, 10);
-      expect(props.comparisonLabel).toBe('vs Stesso Periodo Anno Prec.');
+    it('reads the offset column in time_shift mode and ignores target/total columns', () => {
+      const props = run(
+        {
+          calculation_mode: 'time_shift',
+          metric: 'sum_richieste',
+          time_compare: '1 month ago',
+          target_metric: 'target_metrica',
+          total_metric: 'totale_metrica',
+        },
+        [
+          {
+            'target_metrica__1 month ago': 999,
+            'totale_metrica__1 month ago': 888,
+            'sum_richieste__1 year ago': 100,
+            'sum_richieste__1 month ago': 105,
+            sum_richieste: 110,
+          },
+        ],
+      );
+      expect(props.comparisonValue).toBe(105);
+      expect(props.comparisonLabel).toBe('vs Mese Prec.');
+
+      const fallbackPrefixOnly = run(
+        { calculation_mode: 'time_shift', metric: 'sum_richieste', target_metric: 'target_metrica' },
+        [{ 'target_metrica__1 year ago': 999, 'sum_richieste__1 year ago': 100, sum_richieste: 110 }],
+      );
+      expect(fallbackPrefixOnly.comparisonValue).toBe(100);
+      expect(fallbackPrefixOnly.deltaPercent).toBeCloseTo(10, 10);
+      expect(fallbackPrefixOnly.comparisonLabel).toBe('vs Stesso Periodo Anno Prec.');
     });
 
     it.each([
@@ -376,20 +421,29 @@ describe('KPI Comparison transformProps', () => {
   });
 
   describe('delta, polarity and badge colors', () => {
-    it('reports the new badge (Nuovo with locale it) when the comparison is zero and the primary is positive', () => {
+    it('reports the new badge (Nuovo with locale it) and sets hasComparison true on a zero baseline', () => {
       const props = run(dualMetric, [{ sum_richieste: 5, sum_richieste_conf: 0 }]);
       expect(props.deltaPercent).toBeNull();
+      expect(props.hasComparison).toBe(true);
       expect(props.formattedDeltaPercent).toBe('Nuovo');
       expect(props.trendDirection).toBe('none');
       expect(props.badgeBackgroundColor).toBe('#f1f5f9');
       expect(props.badgeTextColor).toBe('#64748b');
+
+      const propsNeg = run(dualMetric, [{ sum_richieste: -5, sum_richieste_conf: 0 }]);
+      expect(propsNeg.hasComparison).toBe(true);
+      expect(propsNeg.formattedDeltaPercent).toBe('Nuovo');
     });
 
-    it('reports 0% flat when both values are zero', () => {
-      const props = run(dualMetric, [{ sum_richieste: 0, sum_richieste_conf: 0 }]);
-      expect(props.deltaPercent).toBe(0);
-      expect(props.trendDirection).toBe('flat');
-      expect(props).toMatchObject(NEUTRAL);
+    it('reports localized 0% flat when both values are zero', () => {
+      const propsIt = run(dualMetric, [{ sum_richieste: 0, sum_richieste_conf: 0 }]);
+      expect(propsIt.deltaPercent).toBe(0);
+      expect(propsIt.formattedDeltaPercent).toBe('0,0%');
+      expect(propsIt.trendDirection).toBe('flat');
+      expect(propsIt).toMatchObject(NEUTRAL);
+
+      const propsEn = run({ ...dualMetric, locale: 'en' }, [{ sum_richieste: 0, sum_richieste_conf: 0 }]);
+      expect(propsEn.formattedDeltaPercent).toBe('0.0%');
     });
 
     it('divides by the absolute comparison value for negative baselines', () => {
@@ -496,13 +550,21 @@ describe('KPI Comparison transformProps', () => {
       expect(props.sparklineData).toEqual([]);
     });
 
-    it('uses the first row as reference outside dual-metric mode', () => {
+    it('uses the most recent row as reference outside dual-metric mode and reverses descending sparkline queries', () => {
       const props = run(
         { calculation_mode: 'time_shift', metric: 'sum_richieste', show_sparkline: true },
         monthlyRows,
       );
-      expect(props.primaryValue).toBe(10);
+      expect(props.primaryValue).toBe(30);
       expect(props.sparklineData).toEqual([10, 50, 30]);
+
+      const descRows = [...monthlyRows].reverse();
+      const propsDesc = run(
+        { calculation_mode: 'time_shift', metric: 'sum_richieste', time_column: 'mese', show_sparkline: true },
+        descRows,
+      );
+      expect(propsDesc.primaryValue).toBe(30);
+      expect(propsDesc.sparklineData).toEqual([10, 50, 30]);
     });
 
     it.each([
@@ -623,6 +685,14 @@ describe('KPI Comparison transformProps', () => {
       expect(props.kpiTitle).toBe('Accessi Cardiologia');
     });
 
+    it('supports column objects in dynamic_subtitle_column', () => {
+      const props = run(
+        { ...dualMetric, dynamic_subtitle_column: { column_name: 'reparto' } },
+        [{ sum_richieste: 1, reparto: 'Cardiologia' }],
+      );
+      expect(props.kpiSubtitle).toBe('Cardiologia');
+    });
+
     it('uses the dynamic column value as subtitle when none is configured', () => {
       const props = run(
         { ...dualMetric, dynamic_subtitle_column: 'reparto' },
@@ -663,13 +733,18 @@ describe('KPI Comparison transformProps', () => {
   });
 
   describe('number formatting and card background', () => {
-    it('formats values through the Superset SMART_NUMBER formatter', () => {
-      const props = run({ ...dualMetric, number_format: 'SMART_NUMBER' }, [
+    it('formats values through the Superset SMART_NUMBER formatter according to locale', () => {
+      const propsIt = run({ ...dualMetric, number_format: 'SMART_NUMBER' }, [
         { sum_richieste: 1200, sum_richieste_conf: 1000 },
       ]);
-      expect(props.formattedPrimary).toBe('1.2k');
-      expect(props.formattedComparison).toBe('1k');
-      expect(props.formattedDeltaAbsolute).toBe('+200');
+      expect(propsIt.formattedPrimary).toBe('1,2k');
+      expect(propsIt.formattedComparison).toBe('1k');
+      expect(propsIt.formattedDeltaAbsolute).toBe('+200');
+
+      const propsEn = run({ ...dualMetric, number_format: 'SMART_NUMBER', locale: 'en' }, [
+        { sum_richieste: 1200, sum_richieste_conf: 1000 },
+      ]);
+      expect(propsEn.formattedPrimary).toBe('1.2k');
     });
 
     it('formats values through a d3 format string', () => {
@@ -741,6 +816,23 @@ describe('KPI Comparison transformProps', () => {
       expect(props.comparisonValue).toBe(100);
       expect(props.deltaPercent).toBe(30);
       expect(props.trendDirection).toBe('up');
+    });
+
+    it('enforces metric prefix and excludes target/total in anti_cartesian 1-row paired heuristic', () => {
+      const antiCartesianFd = {
+        enable_comparison: true,
+        calculation_mode: 'anti_cartesian',
+        metric: 'richieste',
+      };
+      const propsRejected = run(antiCartesianFd, [
+        { richieste: 130, target_conf: 999, totale_t2: 888, other_conf: 50 },
+      ]);
+      expect(propsRejected.comparisonValue).toBeNull();
+
+      const propsMatched = run(antiCartesianFd, [
+        { richieste: 130, target_conf: 999, richieste_conf: 100 },
+      ]);
+      expect(propsMatched.comparisonValue).toBe(100);
     });
 
     it('extracts dynamic date subtitle from DATA_RIFERIMENTO', () => {
@@ -879,6 +971,26 @@ describe('KPI Comparison transformProps', () => {
       const props = run({ ...dualMetric, kpi_subtitle: '{month}', comparison_label: 'vs previous period' }, monthlyRows);
       expect(props.kpiSubtitle).toBe('Marzo 2026');
       expect(props.comparisonLabel).toBe('vs Febbraio 2026');
+    });
+
+    it('translates dynamic title prefixes for Peak, Min and Requests when locale is en', () => {
+      const reqEn = english(
+        { ...dualMetric, show_sparkline: true, kpi_title: 'Requests' },
+        monthlyRows,
+      );
+      expect(reqEn.kpiTitle).toBe('Requests · March 2026');
+
+      const reqFromItTitle = english(
+        { ...dualMetric, show_sparkline: true, kpi_title: 'Richieste' },
+        monthlyRows,
+      );
+      expect(reqFromItTitle.kpiTitle).toBe('Requests · March 2026');
+
+      const peakEn = english(
+        { calculation_mode: 'dual_metric', metric: 'sum_richieste', show_sparkline: false, kpi_title: 'Peak' },
+        monthlyRows,
+      );
+      expect(peakEn.kpiSubtitle).toBe('February 2026');
     });
   });
 });
