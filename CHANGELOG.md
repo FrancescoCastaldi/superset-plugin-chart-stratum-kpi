@@ -5,6 +5,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [0.6.0] - 2026-11-11
+
+### Added
+- **Time and duration metrics.** A metric of type Time (SQL Server `time`, an average waiting time such as `00:12:54.425000`) arrives as text and was read with `parseFloat`, which turned the card into `0` without any error. The card now reads it as seconds and writes value, comparison and absolute delta as durations (`15:00`, `+05:00`); the percentage delta and the progress bar stay numbers.
+- Accepted texts: `HH:MM:SS`, `H:MM:SS.ffffff`, more than 24 hours (`26:10:00`), `1 day, 2:03:04`, `0 days 00:12:54.425000` and ISO 8601 durations (`PT12M54S`). Two-part values such as `12:54` are not read (hours and minutes, or minutes and seconds).
+- The target and total metrics are read when they arrive as times, and the static target is typed as a time (`00:10:00`) or in seconds.
+- Controls `time_display_format` (automatic `mm:ss` or `h:mm:ss`, hours minutes seconds, minutes and seconds, decimal minutes, decimal hours, seconds) and `time_fraction_digits` (0 to 3). They show up on their own, only when a metric picked in the Data section looks like a Time field (a saved metric on a TIME or INTERVAL column, a simple metric on such a column, a custom SQL naming one, or a name such as attesa, durata, tempo, lead time, wait, duration).
+- `test/timeMetrics.test.ts`: 14 tests.
+
+### Changed
+- The number format does not apply to a Time metric. The polarity is not changed by itself: for waiting times turn on *Invert color polarity*.
+
 ## [0.5.3] - 2026-11-01
 
 ### Changed

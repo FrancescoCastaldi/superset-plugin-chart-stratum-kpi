@@ -16,8 +16,11 @@ import {
   formatMetricValue,
   formatMonthYear,
   getMetricLabel,
+  isNumericCell,
   parseNumericValue,
+  parseStaticNumber,
 } from '../utils/formatters';
+import { formatDuration, formatSignedDuration, parseTimeToSeconds, TimeDisplayFormat } from '../utils/timeValues';
 import { periodTitle, readDashboardPeriods, withNoData } from '../utils/dashboardPeriods';
 import {
   getKpiTexts,
@@ -110,7 +113,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
     if (primaryValue === null) {
       // Fallback: first numeric column
       const firstNumKey = Object.keys(referenceRow).find(
-        k => typeof referenceRow?.[k] === 'number',
+        k => isNumericCell(referenceRow?.[k]),
       );
       if (firstNumKey) {
         primaryValue = parseNumericValue(referenceRow[firstNumKey]);
@@ -123,7 +126,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
       comparisonValue = null;
     } else if (calculationMode === 'static_target') {
       const staticVal = getProp<string>('targetStaticValue', 'target_static_value', '');
-      const parsedStatic = parseFloat(staticVal);
+      const parsedStatic = parseStaticNumber(staticVal);
       if (!isNaN(parsedStatic)) {
         comparisonValue = parsedStatic;
       } else {
@@ -240,14 +243,14 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
     // 1. Try dynamic metric from data
     const targetMetricProp = getProp<any>('targetMetric', 'target_metric', null);
     const targetMetricKey = getMetricLabel(targetMetricProp);
-    if (targetMetricKey && data && data.length > 0 && typeof data[0][targetMetricKey] === 'number') {
+    if (targetMetricKey && data && data.length > 0 && isNumericCell(data[0][targetMetricKey])) {
       targetValue = parseNumericValue(data[0][targetMetricKey]);
     }
     
     // 2. Try static value if dynamic is missing or invalid
     const targetStaticVal = getProp<string>('targetStaticValue', 'target_static_value', '');
     if (targetValue === null && targetStaticVal) {
-      const parsedStatic = parseFloat(targetStaticVal);
+      const parsedStatic = parseStaticNumber(targetStaticVal);
       if (!isNaN(parsedStatic)) {
         targetValue = parsedStatic;
       }
@@ -276,13 +279,25 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
 
   // Format strings
   const numberFormat = getProp<string | undefined>('numberFormat', 'number_format', undefined);
-  const formattedPrimary = formatMetricValue(primaryValue, numberFormat, kpiLocale);
-  const formattedComparison = formatMetricValue(comparisonValue, numberFormat, kpiLocale);
+  // A Time metric (its values are texts like "00:12:54") is written as a duration, not with the number format
+  const primaryRaw = primaryKeyUsed && referenceRow ? referenceRow[primaryKeyUsed] : undefined;
+  const isTimeKpi = parseTimeToSeconds(primaryRaw) !== null;
+  const timeOptions = {
+    format: getProp<TimeDisplayFormat>('timeDisplayFormat', 'time_display_format', 'auto'),
+    fractionDigits: Math.min(3, Math.max(0, Math.round(Number(getProp('timeFractionDigits', 'time_fraction_digits', 0))) || 0)),
+    referenceSeconds: Math.max(Math.abs(primaryValue ?? 0), Math.abs(comparisonValue ?? 0)),
+  };
+  const formatValue = (value: number | null): string =>
+    isTimeKpi && value !== null ? formatDuration(value, timeOptions) : formatMetricValue(value, numberFormat, kpiLocale);
+  const formattedPrimary = formatValue(primaryValue);
+  const formattedComparison = formatValue(comparisonValue);
   let formattedDeltaPercent = formatDeltaPercent(deltaPercent, 1, kpiLocale);
   let formattedDeltaAbsolute =
-    deltaAbsolute !== null
-      ? `${deltaAbsolute > 0 ? '+' : ''}${formatNumberLocale(deltaAbsolute, 0, kpiLocale)}`
-      : '—';
+    deltaAbsolute === null
+      ? '—'
+      : isTimeKpi
+      ? formatSignedDuration(deltaAbsolute, timeOptions)
+      : `${deltaAbsolute > 0 ? '+' : ''}${formatNumberLocale(deltaAbsolute, 0, kpiLocale)}`;
 
   // Zero baseline badge and neutral styling
   if (delta.isZeroBaseline && primaryValue !== null && primaryValue > 0) {
@@ -302,7 +317,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
     const totalMetric = getProp<any>('totalMetric', 'total_metric', null);
     if (totalMetric) {
       const totalMetricKey = getMetricLabel(totalMetric);
-      if (totalMetricKey && data && data.length > 0 && typeof data[0][totalMetricKey] === 'number') {
+      if (totalMetricKey && data && data.length > 0 && isNumericCell(data[0][totalMetricKey])) {
         const totalValue = parseNumericValue(data[0][totalMetricKey]);
         if (totalValue !== null && totalValue !== 0) {
           const pct = (primaryValue / totalValue) * 100;

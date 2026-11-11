@@ -2,6 +2,7 @@ import {
   ControlPanelConfig,
   sharedControls,
 } from '@superset-ui/chart-controls';
+import { hasTimeMetric } from './timeMetricHints';
 
 const t = (str: string) => str;
 
@@ -378,6 +379,48 @@ const config: ControlPanelConfig = {
               label: t('Number format'),
               default: 'SMART_NUMBER',
               renderTrigger: true,
+            },
+          },
+        ],
+        [
+          {
+            name: 'time_display_format',
+            config: {
+              type: 'SelectControl',
+              label: t('Duration format'),
+              renderTrigger: true,
+              clearable: false,
+              default: 'auto',
+              visibility: hasTimeMetric,
+              choices: [
+                ['auto', t('Automatic (mm:ss, or h:mm:ss from one hour)')],
+                ['hms', t('Hours, minutes, seconds (1:05:30)')],
+                ['ms', t('Minutes and seconds (65:30)')],
+                ['minutes', t('Decimal minutes (65.5 min)')],
+                ['hours', t('Decimal hours (1.09 h)')],
+                ['seconds', t('Seconds (3930 s)')],
+              ],
+              description: t(
+                'A metric of type Time (hh:mm:ss, for example an average waiting time) is read automatically and written as a duration. The number format above does not apply to it. For waiting times, turn on Invert color polarity so that a rise shows in red. A static target is typed as a time (00:10:00) or in seconds.',
+              ),
+            },
+          },
+          {
+            name: 'time_fraction_digits',
+            config: {
+              type: 'SelectControl',
+              label: t('Duration decimals'),
+              renderTrigger: true,
+              clearable: false,
+              default: 0,
+              visibility: hasTimeMetric,
+              choices: [
+                [0, t('None')],
+                [1, t('One')],
+                [2, t('Two')],
+                [3, t('Three')],
+              ],
+              description: t('Digits after the comma in the seconds (clock formats) or in the value (decimal formats). Example: 0 writes 12:54, 3 writes 12:54.425.'),
             },
           },
         ],

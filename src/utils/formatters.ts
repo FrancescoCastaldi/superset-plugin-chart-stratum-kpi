@@ -1,5 +1,6 @@
 import { ENGLISH_MONTHS, ITALIAN_MONTH_NAMES, monthIndexOf } from './locale';
 import { getNumberFormatter } from '@superset-ui/core';
+import { parseTimeToSeconds } from './timeValues';
 
 /**
  * Format a number using Italian convention (dot as thousands separator, comma as decimal).
@@ -85,11 +86,25 @@ export function parseNumericValue(val: any): number | null {
     return isNaN(val) ? null : val;
   }
   if (typeof val === 'string') {
+    // A time ("00:12:54") is a number of seconds; parseFloat would read it as 0
+    const seconds = parseTimeToSeconds(val);
+    if (seconds !== null) return seconds;
     const cleaned = val.replace(/\s+/g, '').replace(',', '.');
     const num = parseFloat(cleaned);
     return isNaN(num) ? null : num;
   }
   return null;
+}
+
+/** A cell that holds a number, or a time that is read as one */
+export function isNumericCell(val: unknown): boolean {
+  return typeof val === 'number' || (typeof val === 'string' && parseTimeToSeconds(val) !== null);
+}
+
+/** The target typed in a control: a time (`00:10:00`, in seconds) or a plain number */
+export function parseStaticNumber(text: string): number {
+  const seconds = parseTimeToSeconds(text);
+  return seconds !== null ? seconds : parseFloat(text);
 }
 
 export const ITALIAN_MONTHS = ITALIAN_MONTH_NAMES;
