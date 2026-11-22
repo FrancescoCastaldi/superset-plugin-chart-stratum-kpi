@@ -23,7 +23,10 @@
     "studio": "npm --prefix dev-studio run dev",
     "test": "node ./node_modules/jest/bin/jest.js --preset=ts-jest || node ../../node_modules/jest/bin/jest.js --preset=ts-jest",
     "test:watch": "node ./node_modules/jest/bin/jest.js --preset=ts-jest --watch || node ../../node_modules/jest/bin/jest.js --preset=ts-jest --watch",
-    "install:plugin": "powershell -ExecutionPolicy Bypass -File ./install-plugin.ps1"
+    "install:plugin": "powershell -ExecutionPolicy Bypass -File ./install-plugin.ps1",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit -p tsconfig.json || node ./node_modules/typescript/bin/tsc --noEmit -p tsconfig.json",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\""
   },
   "keywords": [
     "stratum",
@@ -48,6 +51,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@superset-ui/chart-controls": "^0.20.3",
     "@superset-ui/core": "^0.20.4",
     "@types/jest": "^29.5.12",
@@ -55,10 +59,16 @@
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "esbuild": "^0.25.12",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^15.15.0",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "prettier": "^3.10.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "ts-jest": "^29.1.2",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "typescript-eslint": "^8.73.0"
   }
 }

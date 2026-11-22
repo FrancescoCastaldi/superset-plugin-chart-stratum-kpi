@@ -9,6 +9,8 @@ import { getKpiTexts } from '../utils/locale';
 export function sanitizeClickUrl(raw?: string): string | null {
   if (typeof raw !== 'string') return null;
   const trimmed = raw.trim();
+  // Rifiuta i caratteri di controllo: servono a nascondere URL non sicuri.
+  // eslint-disable-next-line no-control-regex
   if (!trimmed || /[\u0000-\u001F\u007F]/.test(trimmed)) return null;
   if (trimmed.startsWith('//')) return null;
   if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) {
