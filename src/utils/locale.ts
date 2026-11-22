@@ -31,6 +31,10 @@ export interface KpiTexts {
   minPrefix: string;
   requestsPrefix: string;
   changePrefix: string;
+  /** Etichetta del mini-grafico per i lettori di schermo */
+  sparklineLabel: string;
+  /** Messaggio al posto della scheda se il disegno fallisce */
+  renderError: string;
 }
 
 export const ENGLISH_MONTHS = [
@@ -65,6 +69,8 @@ const EN: KpiTexts = {
   minPrefix: 'Min',
   requestsPrefix: 'Requests',
   changePrefix: 'Change',
+  sparklineLabel: 'Trend over the periods',
+  renderError: 'Unable to show the card.',
 };
 
 const IT: KpiTexts = {
@@ -89,6 +95,8 @@ const IT: KpiTexts = {
   minPrefix: 'Minimo',
   requestsPrefix: 'Richieste',
   changePrefix: 'Variazione',
+  sparklineLabel: 'Andamento sui periodi',
+  renderError: 'Impossibile mostrare la scheda.',
 };
 
 export function getKpiTexts(locale: unknown): KpiTexts {

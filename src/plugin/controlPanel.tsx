@@ -83,7 +83,7 @@ const config: ControlPanelConfig = {
               label: 'Abilita confronto e variazione percentuale',
               default: true,
               description:
-                'Attiva il confronto con una seconda metrica, un periodo passato o un obiettivo. Se disattivato mostra solo il valore principale.',
+                'Attiva il confronto con una seconda metrica, un periodo passato o un obiettivo. Se disattivato mostra solo il valore principale. Esempio: attivo, accanto a 1.250 compare +12,5% rispetto all\'anno scorso.',
               renderTrigger: true,
             },
           },

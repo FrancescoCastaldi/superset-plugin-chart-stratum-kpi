@@ -4,6 +4,8 @@ import { KPIComparisonBadge } from './KPIComparisonBadge';
 import { KPISparkline } from './KPISparkline';
 import { syncChartHeaderTitle } from '../utils/chartHeaderTitle';
 import { getKpiTexts } from '../utils/locale';
+import { kpiThemeVars, useHostColors } from '../utils/hostColors';
+import ErrorBoundary from './ErrorBoundary';
 
 /** Accepts only http(s) URLs and safe relative paths; rejects javascript:, data:, vbscript: and protocol-relative // links. */
 export function sanitizeClickUrl(raw?: string): string | null {
@@ -44,7 +46,7 @@ const GOOGLE_FONTS_MAP: Record<string, string> = {
   'Fira Code': 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap',
 };
 
-export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
+const KPIComparisonCard: React.FC<KPIComparisonProps> = ({
   width,
   height,
   comparisonValue = null,
@@ -112,6 +114,8 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
   const texts = getKpiTexts(locale);
   const safeClickUrl = sanitizeClickUrl(clickUrl);
   const rootRef = React.useRef<HTMLDivElement>(null);
+  // Colori predefiniti che seguono il tema della pagina (quelli scelti nel pannello restano com'erano)
+  const hostColors = useHostColors(rootRef);
   const headerTitle = showTitle && titleInChartHeader && Boolean(kpiTitle && kpiTitle.trim());
 
   // The title lives in the title bar of the dashboard chart, not inside the card
@@ -276,7 +280,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
     case 'bordered':
       border = cardBorderColor
         ? `${cardBorderWidth || 1}px solid ${cardBorderColor}`
-        : '1px solid #e2e8f0';
+        : '1px solid var(--kpi-border, #e2e8f0)';
       boxShadow = 'none';
       break;
     case 'none':
@@ -290,7 +294,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
   let finalBadgeBg = badgeBackgroundColor;
   let finalBadgeText = badgeTextColor;
   let finalCardBg = cardBgColor;
-  let primaryValueColor = '#0f172a';
+  let primaryValueColor = 'var(--kpi-text, #0f172a)';
 
   if (trendDirection === 'up' || trendDirection === 'down') {
     const isPositive =
@@ -314,8 +318,8 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
     } else if (applyTrendColorTo === 'text') {
       primaryValueColor = semanticColor.base;
       // Neutral badge
-      finalBadgeBg = '#f1f5f9';
-      finalBadgeText = '#334155';
+      finalBadgeBg = 'var(--kpi-badge-bg, #f1f5f9)';
+      finalBadgeText = 'var(--kpi-strong, #334155)';
     } else {
       // Default: badge only
       finalBadgeBg = badgeStyle === 'subtle' ? 'transparent' : semanticColor.light2;
@@ -333,11 +337,35 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
         : 'flex-start',
   };
 
+  // Riassunto per i lettori di schermo: titolo, valore e variazione in una frase
+  const ariaSummary = [
+    kpiTitle?.trim(),
+    `${prefixValue ?? ''}${formattedPrimary}${suffixValue ?? ''}`,
+    hasComparison && formattedDeltaPercent ? `${texts.changePrefix} ${formattedDeltaPercent}` : '',
+    hasComparison && comparisonLabel ? comparisonLabel : '',
+  ]
+    .filter(Boolean)
+    .join(', ');
+
   return (
     <div
       ref={rootRef}
+      role={safeClickUrl ? 'link' : 'group'}
+      aria-label={ariaSummary}
+      tabIndex={safeClickUrl ? 0 : undefined}
       onClick={safeClickUrl ? () => openSafeClickUrl(safeClickUrl, clickTarget) : undefined}
+      onKeyDown={
+        safeClickUrl
+          ? e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openSafeClickUrl(safeClickUrl, clickTarget);
+              }
+            }
+          : undefined
+      }
       style={{
+        ...kpiThemeVars(hostColors),
         width,
         height,
         boxSizing: 'border-box',
@@ -402,7 +430,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
                     ? '0.74rem'
                     : '0.90rem',
                 fontWeight: (titleFontWeight as any) || 600,
-                color: titleColor || '#475569',
+                color: titleColor || 'var(--kpi-title, #475569)',
                 letterSpacing: '0.02em',
                 textTransform: (titleTextTransform as any) || 'uppercase',
                 lineHeight: 1.2,
@@ -426,7 +454,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
                       ? '0.92rem'
                       : '0.74rem',
                   fontWeight: (subtitleFontWeight as any) || 400,
-                  color: subtitleColor || '#94a3b8',
+                  color: subtitleColor || 'var(--kpi-subtitle, #94a3b8)',
                   marginTop: '1px',
                   lineHeight: 1.2,
                   whiteSpace: 'nowrap',
@@ -488,7 +516,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
             style={{
               fontSize: `${Math.max(10, Math.round(primaryFontSizePx * 0.52))}px`,
               fontWeight: 600,
-              color: '#64748b',
+              color: 'var(--kpi-muted, #64748b)',
               marginRight: '2px',
               lineHeight: 1,
               flexShrink: 0,
@@ -523,7 +551,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
               fontFamily: resolvedFontFamily,
               fontSize: `${Math.max(10, Math.round(primaryFontSizePx * 0.5))}px`,
               fontWeight: 600,
-              color: '#64748b',
+              color: 'var(--kpi-muted, #64748b)',
               marginLeft: '3px',
               lineHeight: 1,
               flexShrink: 0,
@@ -605,7 +633,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
                     flexWrap: wrapBottomContent !== false ? 'wrap' : 'nowrap',
                     alignItems: 'center',
                     gap: '3px',
-                    color: comparisonColor || '#64748b',
+                    color: comparisonColor || 'var(--kpi-muted, #64748b)',
                     fontSize:
                       comparisonFontSize === 'medium'
                         ? '0.84rem'
@@ -647,7 +675,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
                     <span
                       style={{
                         fontWeight: 600,
-                        color: comparisonColor ? comparisonColor : '#334155',
+                        color: comparisonColor ? comparisonColor : 'var(--kpi-strong, #334155)',
                         whiteSpace: 'nowrap',
                         flexShrink: 0,
                       }}
@@ -665,7 +693,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
             showBottomSubtitle && (
               <div
                 style={{
-                  color: '#64748b',
+                  color: 'var(--kpi-muted, #64748b)',
                   fontSize: isVerticalUltraCompact
                     ? '0.74rem'
                     : isVerticalCompact
@@ -695,6 +723,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
             height={height < 160 ? 22 : 36}
             curve={sparklineCurve}
             showPoints={sparklineShowPoints}
+            label={texts.sparklineLabel}
           />
         </div>
       )}
@@ -714,7 +743,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
             style={{
               width: '100%',
               height: '4px',
-              backgroundColor: '#e2e8f0',
+              backgroundColor: 'var(--kpi-track, #e2e8f0)',
               borderRadius: '2px',
               overflow: 'hidden',
             }}
@@ -736,7 +765,7 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
           <div
             style={{
               fontSize: '0.7rem',
-              color: '#64748b',
+              color: 'var(--kpi-muted, #64748b)',
               textAlign: 'right',
               fontWeight: 500,
             }}
@@ -748,5 +777,17 @@ export const KPIComparisonChart: React.FC<KPIComparisonProps> = ({
     </div>
   );
 };
+
+/** La scheda KPI, protetta da un errore di disegno che lascerebbe vuota la card. */
+export const KPIComparisonChart: React.FC<KPIComparisonProps> = props => (
+  <ErrorBoundary
+    width={props.width}
+    height={props.height}
+    message={getKpiTexts(props.locale).renderError}
+    resetKey={props.formattedPrimary}
+  >
+    <KPIComparisonCard {...props} />
+  </ErrorBoundary>
+);
 
 export default KPIComparisonChart;

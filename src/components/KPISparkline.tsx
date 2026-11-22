@@ -9,6 +9,8 @@ interface KPISparklineProps {
   width?: number | string;
   curve?: 'smooth' | 'linear';
   showPoints?: boolean;
+  /** Testo per i lettori di schermo; senza, il grafico è decorativo. */
+  label?: string;
 }
 
 export const KPISparkline: React.FC<KPISparklineProps> = ({
@@ -19,6 +21,7 @@ export const KPISparkline: React.FC<KPISparklineProps> = ({
   width = '100%',
   curve = 'smooth',
   showPoints = false,
+  label,
 }) => {
   const uid = React.useId();
 
@@ -42,6 +45,9 @@ export const KPISparkline: React.FC<KPISparklineProps> = ({
       <svg
         viewBox={`0 0 ${graphWidth} ${height}`}
         preserveAspectRatio="none"
+        role={label ? 'img' : undefined}
+        aria-label={label}
+        aria-hidden={label ? undefined : true}
         style={{ width: '100%', height: '100%', display: 'block' }}
       >
         <defs>

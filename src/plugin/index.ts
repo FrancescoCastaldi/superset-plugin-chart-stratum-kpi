@@ -5,25 +5,13 @@ import transformProps from './transformProps';
 import thumbnail from '../images/thumbnail.png';
 import example from '../images/example.png';
 
-const t = (str: string) => str;
-
 const metadata = new ChartMetadata({
-  name: t('StratumKPI: Comparison Card & Delta %'),
-  description: t(
-    'All-in-one compact KPI card with time comparison or dual metric, automatic Delta % calculation, colored semantic indicator, polarity inversion (e.g. waiting times or costs) and an optional sparkline.',
-  ),
+  name: 'StratumKPI: scheda di confronto e variazione %',
+  description:
+    'Scheda KPI compatta con confronto nel tempo o tra due metriche, variazione % automatica, indicatore colorato, polarità invertibile (per esempio tempi di attesa o costi) e sparkline facoltativa.',
   behaviors: [Behavior.InteractiveChart],
-  category: t('KPI'),
-  tags: [
-    t('Stratum'),
-    t('KPI'),
-    t('Comparison'),
-    t('Delta'),
-    t('Card'),
-    t('Benchmark'),
-    t('Healthcare'),
-    t('Trend'),
-  ],
+  category: 'KPI',
+  tags: ['Stratum', 'KPI', 'Confronto', 'Variazione', 'Scheda', 'Obiettivo', 'Sanità', 'Andamento'],
   credits: ['Francesco Castaldi'],
   exampleGallery: [{ url: example }],
   thumbnail,
