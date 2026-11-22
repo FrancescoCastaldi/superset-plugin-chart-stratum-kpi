@@ -18,11 +18,13 @@ Plugin di visualizzazione KPI comparativo: scostamenti percentuali e assoluti ri
 | `src/components/KPISparkline.tsx` | Sparkline vettoriale SVG con curve Bezier cubiche e marker |
 | `src/utils/timeValues.ts` | Metriche Time: lettura di `HH:MM:SS.ffffff` e ISO 8601 in secondi, formati di visualizzazione delle durate |
 | `src/plugin/timeMetricHints.ts` | Rileva in Explore se una metrica scelta in Dati e un campo Time, per mostrare i controlli delle durate |
+| `src/utils/hostColors.ts` | Colori della pagina ospite (o del fondo della scheda) e variabili `--kpi-*` per il tema scuro |
+| `src/components/ErrorBoundary.tsx` | Messaggio al posto della scheda se il disegno fallisce |
 | `src/utils/sparkline.ts` | Calcolo matematico puro di coordinate e path SVG spline |
 | `src/plugin/controlPanel.tsx` | Controlli nativi di Explore Superset inclusa sezione Tipografia |
 | `src/plugin/transformProps.ts` | Trasformazione dati, formattazione metrica e risoluzione colori |
 | `dev-studio/` | Ambiente interattivo Vite + React HMR per anteprima live e test visivo |
-| `test/` | Suite di 173 unit test Jest (copertura completa formattatori, trend, controlli e curve) |
+| `test/` | Suite di 274 test Jest (copertura completa formattatori, trend, controlli e curve) |
 
 ---
 

@@ -116,6 +116,13 @@ const KPIComparisonCard: React.FC<KPIComparisonProps> = ({
   const rootRef = React.useRef<HTMLDivElement>(null);
   // Colori predefiniti che seguono il tema della pagina (quelli scelti nel pannello restano com'erano)
   const hostColors = useHostColors(rootRef);
+  // Le transizioni di colore partono dopo il primo disegno: i colori dell'ospite si misurano lì
+  // e non devono sfumare dal colore di riserva.
+  const [animate, setAnimate] = React.useState(false);
+  React.useEffect(() => {
+    const id = requestAnimationFrame(() => setAnimate(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
   const headerTitle = showTitle && titleInChartHeader && Boolean(kpiTitle && kpiTitle.trim());
 
   // The title lives in the title bar of the dashboard chart, not inside the card
@@ -382,7 +389,7 @@ const KPIComparisonCard: React.FC<KPIComparisonProps> = ({
         overflow: 'hidden',
         position: 'relative',
         cursor: safeClickUrl ? 'pointer' : 'default',
-        transition: 'background-color 0.2s ease',
+        transition: animate ? 'background-color 0.2s ease' : 'none',
       }}
       title={
         !canRenderTitle && kpiTitle
@@ -539,7 +546,7 @@ const KPIComparisonCard: React.FC<KPIComparisonProps> = ({
             textOverflow: 'ellipsis',
             minWidth: 0,
             flexShrink: 1,
-            transition: 'color 0.2s ease',
+            transition: animate ? 'color 0.2s ease' : 'none',
           }}
           title={`${prefixValue}${formattedPrimary}${suffixValue}`}
         >

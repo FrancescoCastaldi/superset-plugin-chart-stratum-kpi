@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-22
+
+Hardening: the card follows dark pages, is readable by screen readers and no longer leaves an empty card when drawing fails. Saved charts are unchanged.
+
+### Added
+- **Dark pages.** The default colours (value, title, subtitle, comparison, progress track, neutral badge, border) go through CSS variables (`--kpi-*`) with the previous colour as fallback. On a dark page the card reads the text and background colours of the page and sets light variables; with a light page nothing changes. The card's own background wins over the page, and a colour chosen in the panel is never touched. The value was dark on dark before.
+- **Screen readers and keyboard.** The card is a `group` with one sentence (title, value, change, comparison label); with a click URL it is a `link`, reachable with Tab and opened with Enter or Space. The sparkline has an alternative text in the language of the card.
+- **Error boundary.** If drawing fails the card shows a short message instead of an empty tile.
+- `npm run lint` (ESLint 9), `npm run typecheck`, `npm run format:check`; `jest-environment-jsdom` is declared; `.gitattributes` with LF line endings; sidecar files of exFAT volumes are ignored by jest, tsc and eslint.
+- Tests on the panel (every description has an example, no long dashes, defaults are among the choices) and on the new behaviour.
+
+### Changed
+- The chart metadata (name, description, category, tags) is in Italian.
+- Colour transitions start after the first paint, so the card does not fade from the fallback colour.
+
+### Fixed
+- `enable_comparison` was the only control without an example in its description.
+
 ## [0.7.0] - 2026-11-11
 
 ### Fixed

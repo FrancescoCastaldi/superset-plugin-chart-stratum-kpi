@@ -49,13 +49,16 @@ export function mix(first: Rgba, second: Rgba, weight: number): string {
 }
 
 /**
- * Colori della pagina che ospita la scheda: il testo ereditato e il primo fondo non trasparente
- * risalendo dall'elemento. Così la scheda si adatta a un tema scuro senza conoscere il tema di Superset.
+ * Colori su cui poggia la scheda: il testo ereditato e il primo fondo non trasparente risalendo
+ * dalla scheda stessa. Se la scheda ha un fondo suo (scelto nel pannello) conta quello; se è
+ * trasparente conta la pagina che la ospita. Così si adatta a un tema scuro senza conoscere il
+ * tema di Superset.
  */
 export function sampleHostColors(element: Element | null): HostColors {
-  const start = element?.parentElement;
+  const start = element;
   if (!start || typeof window === 'undefined') return LIGHT;
-  const text = parseCssColor(window.getComputedStyle(start).color) ?? LIGHT_TEXT;
+  // La scheda non imposta un colore del testo suo: eredita quello della pagina.
+  const text = parseCssColor(window.getComputedStyle(start.parentElement ?? start).color) ?? LIGHT_TEXT;
 
   let background: Rgba | null = null;
   for (let node: Element | null = start; node; node = node.parentElement) {

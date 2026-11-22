@@ -34,6 +34,22 @@
 
 *Figure 3: A card style with a tinted background, rounded corners and a shadow. More variants: [inverted polarity](docs/images/02_inverted_polarity.png) (a price going down is good news) and [typography](docs/images/typography.png).*
 
+### 🌙 Light and dark pages (v0.8)
+
+The default colours follow the page that hosts the card: on a dark dashboard the value, title and comparison turn light by themselves. If the card has its own background (set in the panel), that background decides, and any colour you pick in the panel is left as it is. The images come from the [Dev Studio](#-dev-studio-locale--live-preview) demo scenarios, not from a Superset dashboard.
+
+![A white card](docs/images/studio_scheda_chiara.png)
+
+*Figure 4: A white card with a sparkline.*
+
+![A dark glass card](docs/images/studio_scheda_scura.png)
+
+*Figure 5: A translucent dark card: the text is light, with no setting needed.*
+
+![Target with a progress bar](docs/images/studio_scheda_obiettivo.png)
+
+*Figure 6: A target with a progress bar. The card is also a group for screen readers (title, value and change in one sentence) and, with a link set, a link you can open with Enter or Space.*
+
 ---
 
 ## 🌟 Key Features
