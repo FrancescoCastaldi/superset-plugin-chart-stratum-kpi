@@ -121,6 +121,16 @@ describe('tema scuro', () => {
     expect(card.style.getPropertyValue('--kpi-track')).not.toBe('');
   });
 
+  it('se la scheda ha un fondo chiaro suo, la pagina scura non conta', () => {
+    const card = mount({ cardBgColor: '#ffffff' }, 'background-color: rgb(20, 24, 33); color: rgb(230, 232, 236)');
+    expect(card.style.getPropertyValue('--kpi-text')).toBe('');
+  });
+
+  it('se la scheda ha un fondo scuro suo, i testi diventano chiari anche in una pagina chiara', () => {
+    const card = mount({ cardBgColor: '#111827' }, 'background-color: rgb(255, 255, 255); color: rgb(230, 232, 236)');
+    expect(card.style.getPropertyValue('--kpi-text')).toBe('rgb(230, 232, 236)');
+  });
+
   it('in una pagina chiara non aggiunge variabili', () => {
     const card = mount({}, 'background-color: rgb(255, 255, 255); color: rgb(15, 23, 42)');
     expect(card.style.getPropertyValue('--kpi-text')).toBe('');
