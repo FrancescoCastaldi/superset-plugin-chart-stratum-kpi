@@ -17,7 +17,7 @@ Questo documento contiene le direttive operative, l'architettura tecnica e il re
 
 ## 📐 Architettura del Plugin
 
-- **Repository**: `D:\Sviluppo\superset-plugins\superset-plugin-chart-kpi-comparison`
+- **Repository**: `<SSD_DRIVE>:\Actual\03_Sviluppo_Software\Repositories\_work\superset-6.1.0-custom\superset-frontend\plugins\superset-plugin-chart-kpi-comparison`
 - **Nome Plugin**: `superset-plugin-chart-kpi-comparison`
 - **Key Registrazione**: `kpi_comparison`
 - **Class Plugin**: `KPIComparisonChartPlugin`
@@ -49,7 +49,7 @@ src/
 ## 🚀 Script di Installazione e Deploy
 
 - **`install-plugin.ps1`**:
-  - Rileva automaticamente `D:\Sviluppo\superset`.
+  - Rileva automaticamente `<SSD_DRIVE>:\Actual\03_Sviluppo_Software\Repositories\apache-superset-6.1.0`.
   - Compila i sorgenti (`npm run build`).
   - Sincronizza i file in `superset-frontend/plugins/superset-plugin-chart-kpi-comparison`.
   - Registra il plugin in `src/visualizations/presets/MainPreset.ts` con creazione backup `.bak`.
@@ -100,14 +100,14 @@ src/
 
 ## 🔐 Credenziali, token & chiavi API — protocollo vault (obbligatorio)
 
-Questo file non contiene segreti e non deve mai contenerne. Tutte le credenziali della chiavetta vivono nel **vault unico** `D:/.env`, cifrato a riposo in `D:/.env.7z` (AES-256). Il protocollo completo è in `D:/AGENTS.md` §5, da leggere prima di qualsiasi attività che richieda un token. In sintesi:
+Questo file non contiene segreti e non deve mai contenerne. Tutte le credenziali della chiavetta vivono nel **vault unico** `<SSD_DRIVE>:/Actual/00_Sicurezza_e_Credenziali/Vault_USB/.env`, cifrato a riposo in `<SSD_DRIVE>:/Actual/00_Sicurezza_e_Credenziali/Vault_USB/.env.7z` (AES-256). Il protocollo completo è in `<SSD_DRIVE>:/Actual/AGENTS.md` §5, da leggere prima di qualsiasi attività che richieda un token. In sintesi:
 
 ```powershell
-powershell -File D:/Scripts/vault/status-env.ps1   # exit 0 = UNLOCKED; exit 2 = LOCKED -> fermarsi e chiedere all'utente di eseguire unlock-env.ps1
-. D:/Scripts/vault/load-env.ps1 -Quiet             # esporta le variabili nella sessione corrente (mai stamparne i valori)
+powershell -File <SSD_DRIVE>:/Actual/00_Sicurezza_e_Credenziali/Vault_USB/scripts/status-env.ps1   # exit 0 = UNLOCKED; exit 2 = LOCKED -> fermarsi e chiedere all'utente di eseguire unlock-env.ps1
+. <SSD_DRIVE>:/Actual/00_Sicurezza_e_Credenziali/Vault_USB/scripts/load-env.ps1 -Quiet             # esporta le variabili nella sessione corrente (mai stamparne i valori)
 ```
 
-- **Chiavi rilevanti per quest'area**: `GH_TOKEN`, `GITHUB_TOKEN`, `GITHUB_USER`. Schema completo (nomi, nessun valore): `D:/.env.example`.
+- **Chiavi rilevanti per quest'area**: `GH_TOKEN`, `GITHUB_TOKEN`, `GITHUB_USER`. Schema completo (nomi, nessun valore): `<SSD_DRIVE>:/Actual/00_Sicurezza_e_Credenziali/Vault_USB/.env.example`.
 - **Vietato**: leggere altri `.env`, `.npmrc` o `connessione_*.txt` come fonte di token; stampare, loggare o copiare valori; committare `.env*` (eccetto `.env.example`); chiedere la password del vault in chat.
-- Vault **LOCKED** → fermarsi e chiedere l'unlock, senza cercare copie altrove. Chiave assente dallo schema → non esiste nel vault: proporne l'aggiunta secondo `D:/AGENTS.md` §5.5.
-- **Fine sessione**: ricordare all'utente `powershell -File D:/Scripts/vault/lock-env.ps1`.
+- Vault **LOCKED** → fermarsi e chiedere l'unlock, senza cercare copie altrove. Chiave assente dallo schema → non esiste nel vault: proporne l'aggiunta secondo `<SSD_DRIVE>:/Actual/AGENTS.md` §5.5.
+- **Fine sessione**: ricordare all'utente `powershell -File <SSD_DRIVE>:/Actual/00_Sicurezza_e_Credenziali/Vault_USB/scripts/lock-env.ps1`.

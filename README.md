@@ -151,12 +151,12 @@ superset-plugin-chart-stratum-kpi/
 Run the installer pointing to your Apache Superset repository:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\install-plugin.ps1 -SupersetPath "D:\Development\superset"
+powershell -ExecutionPolicy Bypass -File .\install-plugin.ps1 -SupersetPath "<SSD_DRIVE>:\Actual\03_Sviluppo_Software\Repositories\apache-superset-6.1.0"
 ```
 
 For a clean installation that also recompiles the Superset frontend:
 ```powershell
-.\install-plugin.ps1 -SupersetPath "D:\Development\superset" -CleanReinstall -RebuildFrontend
+.\install-plugin.ps1 -SupersetPath "<SSD_DRIVE>:\Actual\03_Sviluppo_Software\Repositories\apache-superset-6.1.0" -CleanReinstall -RebuildFrontend
 ```
 
 The script:
