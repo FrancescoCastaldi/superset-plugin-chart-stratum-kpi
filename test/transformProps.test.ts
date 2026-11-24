@@ -751,7 +751,7 @@ describe('KPI Comparison transformProps', () => {
       const props = run({ ...dualMetric, number_format: ',.2f' }, [
         { sum_richieste: 1234.5, sum_richieste_conf: 1000 },
       ]);
-      expect(props.formattedPrimary).toBe('1,234.50');
+      expect(props.formattedPrimary).toBe('1.234,50');
     });
 
     it.each([

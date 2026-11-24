@@ -26,10 +26,10 @@ describe('KPI Comparison formatMetricValue', () => {
     expect(formatMetricValue(0, 'SMART_NUMBER', 'en')).toBe('0');
   });
 
-  it('uses d3 format strings with the default Superset locale', () => {
-    expect(formatMetricValue(1234.5, ',.2f')).toBe('1,234.50');
-    expect(formatMetricValue(0.256, ',.1%')).toBe('25.6%');
-    expect(formatMetricValue(1234, '$,d')).toBe('$1,234');
+  it('writes d3 format strings in Italian by default', () => {
+    expect(formatMetricValue(1234.5, ',.2f')).toBe('1.234,50');
+    expect(formatMetricValue(0.256, ',.1%')).toBe('25,6%');
+    expect(formatMetricValue(1234, '$,d')).toBe('$1.234');
   });
 
   it('reports invalid format strings instead of throwing', () => {

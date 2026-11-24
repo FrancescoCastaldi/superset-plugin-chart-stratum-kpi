@@ -49,8 +49,15 @@ export function formatDeltaPercent(
   return `${sign}${formatted}%`;
 }
 
+/** Scambia i separatori di un numero scritto all'americana: "1,234.56" diventa "1.234,56". */
+export function italianNumber(text: string): string {
+  return text.replace(/[.,]/g, separator => (separator === ',' ? '.' : ','));
+}
+
 /**
- * Format a value using Superset number formatter or Italian fallback.
+ * Format a value using Superset number formatter or Italian fallback. With the Italian locale every
+ * format is written in Italian (1.234,56), also the ones typed by hand; the English locale keeps
+ * the separators of the formatter.
  */
 export function formatMetricValue(
   value: number | null | undefined,
@@ -65,13 +72,7 @@ export function formatMetricValue(
     try {
       const formatter = getNumberFormatter(formatString);
       const formatted = formatter(value);
-      if (
-        locale === 'it' &&
-        (formatString === 'SMART_NUMBER' || formatString === 'SMART_NUMBER_SIGNED')
-      ) {
-        return formatted.replace(/\./g, ',');
-      }
-      return formatted;
+      return locale === 'it' ? italianNumber(formatted) : formatted;
     } catch {
       // Fallback if formatter string is not standard
     }

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-24
+
+### Changed
+- **Numbers in Italian format.** Every number of the card follows the Italian locale also when it has a format chosen in Superset (`,.2f` gives `1.234,50`, `.1%` gives `25,6%`). The English locale of the dashboard keeps its separators.
+
 ## [0.8.0] - 2026-11-22
 
 Hardening: the card follows dark pages, is readable by screen readers and no longer leaves an empty card when drawing fails. Saved charts are unchanged.
