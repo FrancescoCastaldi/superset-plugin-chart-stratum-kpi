@@ -8,8 +8,12 @@ export declare function formatNumberLocale(value: number | null | undefined, dec
  * Format a percentage value with sign (+/-) and 1 or 2 decimals.
  */
 export declare function formatDeltaPercent(value: number | null | undefined, decimals?: number, locale?: 'en' | 'it'): string;
+/** Scambia i separatori di un numero scritto all'americana: "1,234.56" diventa "1.234,56". */
+export declare function italianNumber(text: string): string;
 /**
- * Format a value using Superset number formatter or Italian fallback.
+ * Format a value using Superset number formatter or Italian fallback. With the Italian locale every
+ * format is written in Italian (1.234,56), also the ones typed by hand; the English locale keeps
+ * the separators of the formatter.
  */
 export declare function formatMetricValue(value: number | null | undefined, formatString?: string, locale?: 'en' | 'it'): string;
 /**

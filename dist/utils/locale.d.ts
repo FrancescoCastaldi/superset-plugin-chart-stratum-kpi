@@ -30,6 +30,10 @@ export interface KpiTexts {
     minPrefix: string;
     requestsPrefix: string;
     changePrefix: string;
+    /** Etichetta del mini-grafico per i lettori di schermo */
+    sparklineLabel: string;
+    /** Messaggio al posto della scheda se il disegno fallisce */
+    renderError: string;
 }
 export declare const ENGLISH_MONTHS: string[];
 export declare const ITALIAN_MONTH_NAMES: string[];
