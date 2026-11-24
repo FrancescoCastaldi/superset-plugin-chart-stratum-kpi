@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-11-24
+
+### Changed
+- **Italian by default.** Without a locale from the dashboard, numbers and texts (months, time shifts, labels) are in Italian. A dashboard that sends `locale: en` keeps the English ones.
+
 ## [0.9.0] - 2026-11-24
 
 ### Changed

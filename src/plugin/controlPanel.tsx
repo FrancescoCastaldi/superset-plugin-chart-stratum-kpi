@@ -339,7 +339,7 @@ const config: ControlPanelConfig = {
               label: 'Lingua dei testi e dei numeri automatici',
               description:
                 'Lingua per mesi, prefissi automatici (Picco/Minimo), SMART_NUMBER e tooltip del badge; i testi scritti a mano non vengono tradotti. Esempio: Italiano scrive Marzo 2026.',
-              default: 'en',
+              default: 'it',
               clearable: false,
               renderTrigger: true,
               choices: [

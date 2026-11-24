@@ -158,7 +158,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
     return val !== undefined && val !== null ? val : defaultVal;
   };
 
-  const kpiLocale: 'en' | 'it' = getProp<string>('locale', 'locale', 'en') === 'it' ? 'it' : 'en';
+  const kpiLocale: 'en' | 'it' = getProp<string>('locale', 'locale', 'it') === 'en' ? 'en' : 'it';
   const texts = getKpiTexts(kpiLocale);
   const fmtMonth = (val: any): string => formatMonthYear(val, texts.months);
 
@@ -782,7 +782,7 @@ export default function transformProps(chartProps: ChartProps): KPIComparisonPro
         // The dashboard sent a period but it holds no data: say so instead of asking for a time filter
         resolvedComparisonLabel = `vs ${withNoData(
           periodTitle(dashboardPeriods.comparisonName, dashboardPeriods.comparisonText, texts.vsComparisonPeriod.replace(/^vs /, '')),
-          dashboardPeriods.locale ?? (getProp<string>('locale', 'locale', 'en') === 'it' ? 'it' : 'en'),
+          dashboardPeriods.locale ?? (getProp<string>('locale', 'locale', 'it') === 'en' ? 'en' : 'it'),
         )}`;
       } else if (comparisonValue === null) {
         resolvedComparisonLabel = texts.requiresTimeFilter;

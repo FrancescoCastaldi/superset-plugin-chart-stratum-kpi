@@ -887,12 +887,12 @@ describe('KPI Comparison transformProps', () => {
   });
 
   describe('locale of generated texts', () => {
-    // No locale in the form data: the English default applies
+    // The dashboard asks for English explicitly: the default of the chart is Italian
     const english = (formData: Record<string, any>, data: Row[] = [], rawFormData: Record<string, any> = {}) =>
       transformProps({
         width: 320,
         height: 160,
-        formData,
+        formData: { locale: 'en', ...formData },
         rawFormData,
         queriesData: [{ data }],
       } as any);
@@ -957,7 +957,19 @@ describe('KPI Comparison transformProps', () => {
       );
     });
 
-    it('writes numbers and the progress text the English way by default', () => {
+    it('writes numbers in Italian when the dashboard sends no locale', () => {
+      const props = transformProps({
+        width: 320,
+        height: 160,
+        formData: { metric: 'metric', comparison_metric: 'metric_conf', enable_comparison: true, number_format: ',.2f' },
+        rawFormData: {},
+        queriesData: [{ data: [{ metric: 1234.5, metric_conf: 1000 }] }],
+      } as any);
+      expect(props.formattedPrimary).toBe("1.234,50");
+      expect(props.formattedDeltaPercent).toBe("+23,4%");
+    });
+
+    it('writes numbers and the progress text the English way when the dashboard asks for English', () => {
       const props = english(
         { calculation_mode: 'static_target', metric: 'sum_richieste', target_static_value: '3000000', show_progress_bar: true, enable_comparison: true, show_absolute_delta: true },
         [{ sum_richieste: 10032628.85 }],
